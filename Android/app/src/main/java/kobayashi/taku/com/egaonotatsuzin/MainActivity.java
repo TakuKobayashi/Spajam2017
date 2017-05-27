@@ -19,6 +19,7 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -134,6 +135,20 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void beatRequest(){
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.addCallback(new HttpRequest.ResponseCallback() {
+            @Override
+            public void onSuccess(String url, String body) {
+                Log.d(Config.TAG, "url:" + url + " body:" + body);
+            }
+        });
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("beat", 1);
+        httpRequest.setParams(params);
+        httpRequest.execute(Config.ROOT_URL);
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -148,6 +163,7 @@ public class MainActivity extends Activity {
         mCircleRunnable = new Runnable() {
             public void run() {
                 mSoundGameView.generateCircle();
+                beatRequest();
                 mGenerateCircleHandler.removeCallbacks(mCircleRunnable);
                 mGenerateCircleHandler.postDelayed(mCircleRunnable, 1000);
             }
