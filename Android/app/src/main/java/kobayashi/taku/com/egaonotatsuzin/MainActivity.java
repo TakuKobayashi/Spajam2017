@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
+import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
@@ -31,6 +33,10 @@ public class MainActivity extends Activity {
     private TextView mParamsText;
     private SoundGameView mSoundGameView;
     private Runnable mCircleRunnable;
+    private float mPrevSmileValue = -1f;
+
+    private SoundPool mSoundPool;
+    private int taikoSeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +44,25 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         mParamsText = (TextView) findViewById(R.id.smileValueText);
+
+
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                // USAGE_MEDIA
+                // USAGE_GAME
+                .setUsage(AudioAttributes.USAGE_GAME)
+                // CONTENT_TYPE_MUSIC
+                // CONTENT_TYPE_SPEECH, etc.
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build();
+
+        mSoundPool = new SoundPool.Builder()
+                .setAudioAttributes(audioAttributes)
+                // ストリーム数に応じて
+                .setMaxStreams(1)
+                .build();
+
+        taikoSeId = mSoundPool.load(this, R.raw.taiko, 1);
+
         mDebugParameterHandler = new Handler(){
             //メッセージ受信
             public void handleMessage(Message message) {
@@ -85,19 +110,26 @@ public class MainActivity extends Activity {
                     @Override
                     public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
                         SparseArray<Face> faces = detectionResults.getDetectedItems();
-                        Log.d(Config.TAG, "faces:" + faces.size());
+                        float maxSmilingScore = Float.MIN_VALUE;
                         for(int i = 0;i < faces.size();++i){
                             if(faces.get(i) == null) continue;
                             Message msg = Message.obtain();
                             msg.obj = "smile:" + faces.get(i).getIsSmilingProbability();
                             mDebugParameterHandler.sendMessage(msg);
-                            Log.d(Config.TAG, "smile:" + faces.get(i).getIsSmilingProbability());
+                            if(maxSmilingScore < faces.get(i).getIsSmilingProbability()){
+                                maxSmilingScore = faces.get(i).getIsSmilingProbability();
+                            }
                         }
-                        Log.d(Config.TAG, "update");
+                        if(mPrevSmileValue < ApplicationParameter.SMILE_THREATHOLD && ApplicationParameter.SMILE_THREATHOLD < maxSmilingScore){
+                            Log.d(Config.TAG, "smile!!");
+                            executeSmile();
+                        }
+                        mPrevSmileValue = maxSmilingScore;
                     }
 
                     @Override
                     public void onMissing(FaceDetector.Detections<Face> detectionResults) {
+                        mPrevSmileValue = -1f;
                         Log.d(Config.TAG, "missing");
                     }
 
@@ -120,6 +152,12 @@ public class MainActivity extends Activity {
                 .setFacing(CameraSource.CAMERA_FACING_FRONT)
                 .setRequestedFps(30.0f)
                 .build();
+    }
+
+    private void executeSmile(){
+        // one.wav の再生
+        // play(ロードしたID, 左音量, 右音量, 優先度, ループ,再生速度)
+        mSoundPool.play(taikoSeId, 1.0f, 1.0f, 0, 0, 1);
     }
 
     @Override
@@ -176,5 +214,6 @@ public class MainActivity extends Activity {
         super.onDestroy();
         mCameraSource.release();
         mSoundGameView.releaseAllImage();
+        mSoundPool.release();
     }
 }
