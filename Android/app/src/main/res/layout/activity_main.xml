@@ -6,6 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <kobayashi.taku.com.egaonotatsuzin.SoundGameView
+        android:id="@+id/soundGameView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        />
+
     <TextView
         android:id="@+id/smileValueText"
         android:layout_width="wrap_content"

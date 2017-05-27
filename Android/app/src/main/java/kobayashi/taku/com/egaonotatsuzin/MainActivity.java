@@ -3,11 +3,9 @@ package kobayashi.taku.com.egaonotatsuzin;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
@@ -25,6 +23,7 @@ public class MainActivity extends Activity {
     private CameraSource mCameraSource;
     private Handler mHandler;
     private TextView mParamsText;
+    private SoundGameView mSoundGameView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +38,7 @@ public class MainActivity extends Activity {
                 mParamsText.setText((String) message.obj.toString());
             };
         };
+        mSoundGameView = (SoundGameView) findViewById(R.id.soundGameView);
 
         if(Util.hasSelfPermission(this, Manifest.permission.CAMERA)) {
             setupCamera();
@@ -138,5 +138,6 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         mCameraSource.release();
+        mSoundGameView.releaseAllImage();
     }
 }
