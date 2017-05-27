@@ -163,7 +163,7 @@ public class MainActivity extends Activity {
         mCircleRunnable = new Runnable() {
             public void run() {
                 mSoundGameView.generateCircle();
-                beatRequest();
+                //beatRequest();
                 mGenerateCircleHandler.removeCallbacks(mCircleRunnable);
                 mGenerateCircleHandler.postDelayed(mCircleRunnable, 1000);
             }
