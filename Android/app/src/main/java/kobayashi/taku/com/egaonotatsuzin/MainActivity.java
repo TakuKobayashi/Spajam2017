@@ -3,6 +3,7 @@ package kobayashi.taku.com.egaonotatsuzin;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,16 +25,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-        if(!Util.hasSelfPermission(this, Manifest.permission.CAMERA)) {
+        if(Util.hasSelfPermission(this, Manifest.permission.CAMERA)) {
             setupCamera();
         }
         Util.requestPermissions(this, REQUEST_CODE);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(Config.TAG, "rc:" + requestCode + " rec:" + resultCode);
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(REQUEST_CODE == requestCode){
+            int cameraPermissionIndex = -1;
+            for(int i = 0;i < permissions.length;++i){
+                if(permissions[i].equals(Manifest.permission.CAMERA)){
+                    cameraPermissionIndex = i;
+                    break;
+                }
+            }
+            if(cameraPermissionIndex > 0 && grantResults[cameraPermissionIndex] == PackageManager.PERMISSION_GRANTED) {
+                setupCamera();
+            }
+        }
     }
 
     private void setupCamera() {
@@ -88,11 +99,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         try {
-            Log.d(Config.TAG, "source");
-            mCameraSource.start();
+            if(mCameraSource != null){
+                mCameraSource.start();
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d(Config.TAG, "error*" + e.getMessage());
         }
     }
 
