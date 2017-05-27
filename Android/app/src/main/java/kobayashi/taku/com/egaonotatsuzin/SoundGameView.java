@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -20,6 +21,7 @@ public class SoundGameView extends View {
 
   private Bitmap mClearImage = null;
   private Bitmap mRenderBaseImage = null;
+  private ArrayList<SoundCircle> mSoundCircleList = new ArrayList<SoundCircle>();
 
   public SoundGameView(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -34,8 +36,29 @@ public class SoundGameView extends View {
     }
     mRenderBaseImage = mClearImage.copy(Bitmap.Config.ARGB_8888, true);
     Canvas bitmapCanvas = new Canvas(mRenderBaseImage);
+    ArrayList<SoundCircle> willRemoveCircle = new ArrayList<SoundCircle>();
+
+    for(int i = 0;i < mSoundCircleList.size();++i){
+      SoundCircle soundCircle = mSoundCircleList.get(i);
+      soundCircle.moveTo(new PointF(-3f, 0));
+      soundCircle.render(bitmapCanvas);
+      if(!soundCircle.checkVisible()){
+        willRemoveCircle.add(soundCircle);
+      }
+    }
     canvas.drawBitmap(mRenderBaseImage, null, new Rect(0, 0, mRenderBaseImage.getWidth(), mRenderBaseImage.getHeight()), null);
+
+    for(int i = 0;i < willRemoveCircle.size();++i){
+      SoundCircle soundCircle = willRemoveCircle.get(i);
+      mSoundCircleList.remove(soundCircle);
+    }
     this.invalidate();
+  }
+
+  public void generateCircle(){
+    SoundCircle soundCircle = new SoundCircle();
+    soundCircle.setPosition(this.getWidth(), (float) this.getHeight() / 2);
+    mSoundCircleList.add(soundCircle);
   }
 
   @Override
@@ -49,6 +72,10 @@ public class SoundGameView extends View {
   }
 
   public void releaseAllImage(){
+    for(int i = 0;i < mSoundCircleList.size();++i){
+      mSoundCircleList.get(i).release();
+    }
+    mSoundCircleList.clear();
     if(mRenderBaseImage != null){
       mRenderBaseImage.recycle();
       mRenderBaseImage = null;

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.gms.vision.CameraSource;
@@ -18,12 +19,17 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends Activity {
     private static int REQUEST_CODE = 1;
     private CameraSource mCameraSource;
-    private Handler mHandler;
+    private Handler mDebugParameterHandler;
+    private Handler mGenerateCircleHandler;
     private TextView mParamsText;
     private SoundGameView mSoundGameView;
+    private Runnable mCircleRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +37,15 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         mParamsText = (TextView) findViewById(R.id.smileValueText);
-        mHandler = new Handler(){
+        mDebugParameterHandler = new Handler(){
             //メッセージ受信
             public void handleMessage(Message message) {
                 //メッセージの表示
                 mParamsText.setText((String) message.obj.toString());
             };
         };
+        mGenerateCircleHandler = new Handler();
+
         mSoundGameView = (SoundGameView) findViewById(R.id.soundGameView);
 
         if(Util.hasSelfPermission(this, Manifest.permission.CAMERA)) {
@@ -81,7 +89,7 @@ public class MainActivity extends Activity {
                             if(faces.get(i) == null) continue;
                             Message msg = Message.obtain();
                             msg.obj = "smile:" + faces.get(i).getIsSmilingProbability();
-                            mHandler.sendMessage(msg);
+                            mDebugParameterHandler.sendMessage(msg);
                             Log.d(Config.TAG, "smile:" + faces.get(i).getIsSmilingProbability());
                         }
                         Log.d(Config.TAG, "update");
@@ -116,6 +124,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        setupLooper();
         try {
             if(mCameraSource != null){
                 mCameraSource.start();
@@ -132,6 +141,18 @@ public class MainActivity extends Activity {
         if(mCameraSource != null){
             mCameraSource.stop();
         }
+        mGenerateCircleHandler.removeCallbacks(mCircleRunnable);
+    }
+
+    private void setupLooper(){
+        mCircleRunnable = new Runnable() {
+            public void run() {
+                mSoundGameView.generateCircle();
+                mGenerateCircleHandler.removeCallbacks(mCircleRunnable);
+                mGenerateCircleHandler.postDelayed(mCircleRunnable, 1000);
+            }
+        };
+        mGenerateCircleHandler.postDelayed(mCircleRunnable, 1000);
     }
 
     @Override
