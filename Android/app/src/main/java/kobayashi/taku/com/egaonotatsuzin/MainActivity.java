@@ -1,14 +1,18 @@
 package kobayashi.taku.com.egaonotatsuzin;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.MultiProcessor;
@@ -16,15 +20,26 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     private static int REQUEST_CODE = 1;
     private CameraSource mCameraSource;
+    private Handler mHandler;
+    private TextView mParamsText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+        mParamsText = (TextView) findViewById(R.id.smileValueText);
+        mHandler = new Handler(){
+            //メッセージ受信
+            public void handleMessage(Message message) {
+                //メッセージの表示
+                mParamsText.setText((String) message.obj.toString());
+            };
+        };
+
         if(Util.hasSelfPermission(this, Manifest.permission.CAMERA)) {
             setupCamera();
         }
@@ -64,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(Config.TAG, "faces:" + faces.size());
                         for(int i = 0;i < faces.size();++i){
                             if(faces.get(i) == null) continue;
+                            Message msg = Message.obtain();
+                            msg.obj = "smile:" + faces.get(i).getIsSmilingProbability();
+                            mHandler.sendMessage(msg);
                             Log.d(Config.TAG, "smile:" + faces.get(i).getIsSmilingProbability());
                         }
                         Log.d(Config.TAG, "update");
