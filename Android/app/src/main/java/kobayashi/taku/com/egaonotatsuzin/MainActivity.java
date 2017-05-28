@@ -52,6 +52,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mParamsText = (TextView) findViewById(R.id.smileValueText);
 
+        ImageView bgImageView = (ImageView) findViewById(R.id.bgImage);
+        Bitmap bgImage = ImageCacheManager.getInstance(ImageCacheManager.class).getImageFromAsset("images/game_background.png");
+        bgImageView.setImageBitmap(bgImage);
+
+
+
         setupSoundEffects();
         setupGameSound();
 
@@ -273,6 +279,7 @@ public class MainActivity extends Activity {
             mSoundGameController.release();
         }
         ImageCacheManager.getInstance(ImageCacheManager.class).clearAllCache();
+        Util.releaseImageView((ImageView) findViewById(R.id.bgImage));
         Util.releaseImageView((ImageView) findViewById(R.id.smileIconImage));
         Util.releaseImageView((ImageView) findViewById(R.id.targetImage));
         mSoundPool.release();
