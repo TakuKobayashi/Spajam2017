@@ -186,6 +186,9 @@ public class MainActivity extends Activity {
         // play(ロードしたID, 左音量, 右音量, 優先度, ループ,再生速度)
         //beatRequest();
         mSoundPool.play(taikoSeId, 1.0f, 1.0f, 0, 0, 1);
+        if(mSoundGameView.hit()){
+            Log.d(Config.TAG, "hit");
+        }
     }
 
     @Override

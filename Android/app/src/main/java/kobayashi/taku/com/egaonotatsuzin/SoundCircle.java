@@ -28,13 +28,16 @@ public class SoundCircle{
     mPosition.y = mPosition.y + point.y;
   }
 
+  public RectF getDst(){
+    return new RectF(mPosition.x - ((float) mImage.getWidth() / 2), mPosition.y - ((float) mImage.getHeight() / 2), mPosition.x + ((float) mImage.getWidth() / 2), mPosition.y + ((float) mImage.getHeight() / 2));
+  }
+
   public boolean checkVisible(){
     return mPosition.x > -(float)(mImage.getWidth() / 2);
   }
 
   public void render(Canvas canvas){
-    RectF dst = new RectF(mPosition.x - ((float) mImage.getWidth() / 2), mPosition.y - ((float) mImage.getHeight() / 2), mPosition.x + ((float) mImage.getWidth() / 2), mPosition.y + ((float) mImage.getHeight() / 2));
-    canvas.drawBitmap(mImage, new Rect(0,0, mImage.getWidth(), mImage.getHeight()), dst, null);
+    canvas.drawBitmap(mImage, new Rect(0,0, mImage.getWidth(), mImage.getHeight()), getDst(), null);
   }
 
   public void release(){

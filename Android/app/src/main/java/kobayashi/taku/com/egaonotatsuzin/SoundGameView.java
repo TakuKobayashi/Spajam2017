@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -22,9 +23,14 @@ public class SoundGameView extends View {
   private Bitmap mClearImage = null;
   private Bitmap mRenderBaseImage = null;
   private ArrayList<SoundCircle> mSoundCircleList = new ArrayList<SoundCircle>();
+  private RectF mHitRect = new RectF();
 
   public SoundGameView(Context context, AttributeSet attrs) {
     super(context, attrs);
+  }
+
+  public void setHitRect(RectF rect){
+    mHitRect = rect;
   }
 
   @Override
@@ -59,6 +65,17 @@ public class SoundGameView extends View {
     SoundCircle soundCircle = new SoundCircle();
     soundCircle.setPosition(this.getWidth(), (float) this.getHeight() / 2);
     mSoundCircleList.add(soundCircle);
+  }
+
+  public boolean hit(){
+    boolean isHit = false;
+    for(int i = 0;i < mSoundCircleList.size();++i){
+      RectF dst = mSoundCircleList.get(i).getDst();
+      if(mHitRect.contains(dst)){
+        isHit = true;
+      }
+    }
+    return isHit;
   }
 
   @Override
