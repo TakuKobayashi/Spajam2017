@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -49,6 +51,14 @@ public class MainActivity extends Activity {
         setupSoundEffects();
         setupGameSound();
 
+        ImageView smileIconView = (ImageView) findViewById(R.id.smileIconImage);
+        Bitmap smileImage = ImageCacheManager.getInstance(ImageCacheManager.class).getImageFromAsset("images/smile_icon.png");
+        smileIconView.setImageBitmap(smileImage);
+
+        ImageView targetImageView = (ImageView) findViewById(R.id.targetImage);
+        Bitmap targetImage = ImageCacheManager.getInstance(ImageCacheManager.class).getImageFromAsset("images/target.png");
+        targetImageView.setImageBitmap(targetImage);
+
         mDebugParameterHandler = new Handler(){
             //メッセージ受信
             public void handleMessage(Message message) {
@@ -68,12 +78,14 @@ public class MainActivity extends Activity {
 
     private void setupGameSound(){
         mSoundGameController = new SoundGameController(this, "wonder_music_12");
+        /*
         mSoundGameController.setBeatCallback(new SoundGameController.BeatCallback() {
             @Override
             public void onBeat() {
                 mSoundGameView.generateCircle();
             }
         });
+        */
     }
 
     private void setupSoundEffects(){
@@ -179,7 +191,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-//        setupLooper();
+        setupLooper();
 
         if(mSoundGameController != null){
             mSoundGameController.start();
@@ -225,10 +237,10 @@ public class MainActivity extends Activity {
             public void run() {
                 mSoundGameView.generateCircle();
                 mGenerateCircleHandler.removeCallbacks(mCircleRunnable);
-                mGenerateCircleHandler.postDelayed(mCircleRunnable, 1000);
+                mGenerateCircleHandler.postDelayed(mCircleRunnable, 3000);
             }
         };
-        mGenerateCircleHandler.postDelayed(mCircleRunnable, 1000);
+        mGenerateCircleHandler.postDelayed(mCircleRunnable, 3000);
     }
 
     @Override
@@ -240,6 +252,8 @@ public class MainActivity extends Activity {
             mSoundGameController.release();
         }
         ImageCacheManager.getInstance(ImageCacheManager.class).clearAllCache();
+        Util.releaseImageView((ImageView) findViewById(R.id.smileIconImage));
+        Util.releaseImageView((ImageView) findViewById(R.id.targetImage));
         mSoundPool.release();
     }
 }
