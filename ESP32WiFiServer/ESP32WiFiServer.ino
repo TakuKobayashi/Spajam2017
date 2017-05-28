@@ -24,8 +24,8 @@ Stepper stepper(stepsPerRevolution, 33, 25, 26, 27);
  *  is created on port 80, as that is the port 
  *  typically used for HTTP web browsing.
  */
-const char* ssid     = "Moppy En Fuego";
-const char* password = "hornberger";
+const char* ssid     = "tech-event-dwango";
+const char* password = "BdmnwSUW25";
 WiFiServer server(80);
 
 void setup()
@@ -74,6 +74,7 @@ void loop(){
           // and if the current line is blank, you got two newline characters in a row.
           // that's the end of the client HTTP request, so send a response:
           if (currentLine.length() == 0) {
+            
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
             // and a content-type so the client knows what's coming, then a blank line:
             client.println("HTTP/1.1 200 OK");
@@ -88,8 +89,8 @@ void loop(){
 
             // Swing the hammer
             int steps = stepsPerRevolution/4;
+            stepper.step(-steps - 10);
             stepper.step(steps);
-            stepper.step(-steps);
             
             // break out of the while loop:
             break;

@@ -7,14 +7,14 @@ const http = require('http')
  * This script simply fires continuous "tataku"
  * requests at the ESP32 HTTP server as a means
  * of testing
- * 
+ *
  * Hint: If you call `chmod +x tataku-tester.js`
  * you'll be able to run it simply by typing its
  * name (no need to prefix node)
  */
 function tataku() {
   const options = {
-    host: '192.168.3.15',
+    host: '192.168.220.178',
     path: '/'
   }
 
