@@ -44,6 +44,10 @@ public class MainActivity extends Activity {
     private SoundGameController mSoundGameController;
     private SoundPool mSoundPool;
     private int taikoSeId;
+    private int fiveComboId;
+    private int tenComboId;
+    private int twentyComboId;
+    private int comboCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +125,9 @@ public class MainActivity extends Activity {
                 .build();
 
         taikoSeId = mSoundPool.load(this, R.raw.taiko, 1);
+        fiveComboId = mSoundPool.load(this, R.raw.fivecombo, 1);
+        tenComboId = mSoundPool.load(this, R.raw.tencombo, 1);
+        twentyComboId = mSoundPool.load(this, R.raw.twentycombo, 1);
     }
 
     @Override
@@ -203,14 +210,14 @@ public class MainActivity extends Activity {
         //beatRequest();
         mSoundPool.play(taikoSeId, 1.0f, 1.0f, 0, 0, 1);
         if(mSoundGameView.hit()){
-            MediaPlayer mp = MediaPlayer.create(this, R.raw.fivecombo);
-            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                }
-            });
-            mp.start();
+            comboCount = comboCount + 1;
+            if(comboCount == 5) {
+                mSoundPool.play(fiveComboId, 1.0f, 1.0f, 0, 0, 1);
+            }else if(comboCount == 10){
+                mSoundPool.play(tenComboId, 1.0f, 1.0f, 0, 0, 1);
+            }else if(comboCount == 20){
+                mSoundPool.play(twentyComboId, 1.0f, 1.0f, 0, 0, 1);
+            }
             Log.d(Config.TAG, "hit");
         }
     }
