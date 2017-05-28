@@ -37,6 +37,7 @@ public class MainActivity extends Activity {
     private Handler mDebugParameterHandler;
     private Handler mGenerateCircleHandler;
     private TextView mParamsText;
+    private TextView mPointValueText;
     private SoundGameView mSoundGameView;
     private Runnable mCircleRunnable;
     private float mPrevSmileValue = -1f;
@@ -48,6 +49,7 @@ public class MainActivity extends Activity {
     private int tenComboId;
     private int twentyComboId;
     private int comboCount = 0;
+    private int hitPoint = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +62,8 @@ public class MainActivity extends Activity {
         Bitmap bgImage = ImageCacheManager.getInstance(ImageCacheManager.class).getImageFromAsset("images/game_background.png");
         bgImageView.setImageBitmap(bgImage);
 
-
+        mPointValueText = (TextView) findViewById(R.id.pointValueText);
+        mPointValueText.setText("Point:" + hitPoint);
 
         setupSoundEffects();
         setupGameSound();
@@ -218,6 +221,8 @@ public class MainActivity extends Activity {
             }else if(comboCount == 20){
                 mSoundPool.play(twentyComboId, 1.0f, 1.0f, 0, 0, 1);
             }
+            hitPoint = hitPoint + 10;
+            mPointValueText.setText("Point:" + hitPoint);
             Log.d(Config.TAG, "hit");
         }
     }
