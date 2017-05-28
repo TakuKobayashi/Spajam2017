@@ -26,8 +26,6 @@ public class ImageCacheManager extends ContextSingletonBase{
     options.inPreferredConfig = Bitmap.Config.ARGB_8888;
     AssetManager mngr = context.getAssets();
     try {
-      Log.d(Config.TAG, "--------------------------------------");
-      Log.d(Config.TAG, path);
       InputStream is = mngr.open(path);
       Bitmap image = BitmapFactory.decodeStream(is, null, options);
       mAssetImageCaches.put(path, image);

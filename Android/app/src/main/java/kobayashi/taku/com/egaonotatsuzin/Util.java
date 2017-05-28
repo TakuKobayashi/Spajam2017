@@ -155,4 +155,30 @@ public class Util {
 			}
 		}
 	}
+
+	public static String loadTextFromAsset(Context con,String fileName) {
+
+		AssetManager mngr = con.getAssets();
+		//rawフォルダにあるファイルのリソースでの読み込み
+		String str;
+		try {
+			InputStream is = mngr.open(fileName);
+			str = Util.Is2String(is);
+		} catch (IOException e) {
+			str = "";
+		}
+		return str;
+	}
+
+	public static String Is2String(InputStream in) throws IOException {
+		//入力されたテキストデータ(InputStream,これはbyteデータ)を文字列(String)に変換
+
+		StringBuffer out = new StringBuffer();
+		byte[] b = new byte[4096];
+		//保持しているStringデータ全てをStringBufferに入れる
+		for (int n; (n = in.read(b)) != -1;) {
+			out.append(new String(b, 0, n));
+		}
+		return out.toString();
+	}
 }

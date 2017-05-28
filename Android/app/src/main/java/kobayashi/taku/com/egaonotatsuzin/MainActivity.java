@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
     private Runnable mCircleRunnable;
     private float mPrevSmileValue = -1f;
 
+    private SoundGameController mSoundGameController;
     private SoundPool mSoundPool;
     private int taikoSeId;
 
@@ -45,23 +46,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         mParamsText = (TextView) findViewById(R.id.smileValueText);
 
-
-        AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                // USAGE_MEDIA
-                // USAGE_GAME
-                .setUsage(AudioAttributes.USAGE_GAME)
-                // CONTENT_TYPE_MUSIC
-                // CONTENT_TYPE_SPEECH, etc.
-                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                .build();
-
-        mSoundPool = new SoundPool.Builder()
-                .setAudioAttributes(audioAttributes)
-                // ストリーム数に応じて
-                .setMaxStreams(1)
-                .build();
-
-        taikoSeId = mSoundPool.load(this, R.raw.taiko, 1);
+        setupSoundEffects();
+        setupGameSound();
 
         mDebugParameterHandler = new Handler(){
             //メッセージ受信
@@ -78,6 +64,29 @@ public class MainActivity extends Activity {
             setupCamera();
         }
         Util.requestPermissions(this, REQUEST_CODE);
+    }
+
+    private void setupGameSound(){
+        mSoundGameController = new SoundGameController(this, "wonder_music_12");
+    }
+
+    private void setupSoundEffects(){
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                // USAGE_MEDIA
+                // USAGE_GAME
+                .setUsage(AudioAttributes.USAGE_GAME)
+                // CONTENT_TYPE_MUSIC
+                // CONTENT_TYPE_SPEECH, etc.
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build();
+
+        mSoundPool = new SoundPool.Builder()
+                .setAudioAttributes(audioAttributes)
+                // ストリーム数に応じて
+                .setMaxStreams(1)
+                .build();
+
+        taikoSeId = mSoundPool.load(this, R.raw.taiko, 1);
     }
 
     @Override
@@ -165,6 +174,9 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         setupLooper();
+        if(mSoundGameController != null){
+            mSoundGameController.start();
+        }
         try {
             if(mCameraSource != null){
                 mCameraSource.start();
@@ -195,6 +207,9 @@ public class MainActivity extends Activity {
         if(mCameraSource != null){
             mCameraSource.stop();
         }
+        if(mSoundGameController != null){
+            mSoundGameController.pause();
+        }
         mGenerateCircleHandler.removeCallbacks(mCircleRunnable);
     }
 
@@ -214,6 +229,10 @@ public class MainActivity extends Activity {
         super.onDestroy();
         mCameraSource.release();
         mSoundGameView.releaseAllImage();
+        if(mSoundGameController != null){
+            mSoundGameController.release();
+        }
+        ImageCacheManager.getInstance(ImageCacheManager.class).clearAllCache();
         mSoundPool.release();
     }
 }
