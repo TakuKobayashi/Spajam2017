@@ -5,13 +5,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.RectF;
 import android.media.AudioAttributes;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Display;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -68,7 +72,13 @@ public class MainActivity extends Activity {
         };
         mGenerateCircleHandler = new Handler();
 
+        WindowManager wm = (WindowManager) this.getSystemService( Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point point = new Point();
+        display.getSize(point);
+
         mSoundGameView = (SoundGameView) findViewById(R.id.soundGameView);
+        mSoundGameView.setHitRect(new RectF(smileImage.getWidth(), point.y / 2 - targetImage.getHeight() / 2, smileImage.getWidth() + targetImage.getWidth(), point.y / 2 + targetImage.getHeight() / 2));
 
         if(Util.hasSelfPermission(this, Manifest.permission.CAMERA)) {
             setupCamera();
@@ -187,6 +197,14 @@ public class MainActivity extends Activity {
         //beatRequest();
         mSoundPool.play(taikoSeId, 1.0f, 1.0f, 0, 0, 1);
         if(mSoundGameView.hit()){
+            MediaPlayer mp = MediaPlayer.create(this, R.raw.fivecombo);
+            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    mp.release();
+                }
+            });
+            mp.start();
             Log.d(Config.TAG, "hit");
         }
     }
