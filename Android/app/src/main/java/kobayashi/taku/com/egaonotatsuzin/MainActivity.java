@@ -68,6 +68,12 @@ public class MainActivity extends Activity {
 
     private void setupGameSound(){
         mSoundGameController = new SoundGameController(this, "wonder_music_12");
+        mSoundGameController.setBeatCallback(new SoundGameController.BeatCallback() {
+            @Override
+            public void onBeat() {
+                mSoundGameView.generateCircle();
+            }
+        });
     }
 
     private void setupSoundEffects(){
@@ -173,7 +179,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        setupLooper();
+//        setupLooper();
+
         if(mSoundGameController != null){
             mSoundGameController.start();
         }
