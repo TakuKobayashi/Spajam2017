@@ -11,17 +11,7 @@
 # generated files
 bin/
 gen/
-
-# Local configuration file (sdk path, etc)
-local.properties
-
-# Eclipse project files
-.project
-.checkstyle
-.settings
-proguard-project.txt
-
-#android studio
+obj/
 proguard/
 *.iml
 *.ipr
@@ -35,3 +25,50 @@ app/build/
 build/
 captures/
 
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Eclipse project files
+.project
+.cproject
+.checkstyle
+.settings/
+
+
+# Android NDK Files
+*.so
+*.o
+*.o.d
+
+# Mac
+.DS_Store
+
+# Xcode
+app/proj.ios_mac/build/*
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+*.xcworkspace
+!default.xcworkspace
+xcuserdata
+profile
+*.moved-aside
+
+#CocoaPod
+Pods
+
+#IDEA
+.idea
+
+publish
+
+*.opensdf
+*.sdf
+
+*~
+*#
