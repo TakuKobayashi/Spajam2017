@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "WebSocket.h"
+#include "network/HttpClient.h"
 
 class HelloWorld : public cocos2d::Scene
 {

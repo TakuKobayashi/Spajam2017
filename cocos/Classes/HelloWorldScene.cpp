@@ -3,6 +3,8 @@
 
 USING_NS_CC;
 
+using namespace cocos2d::network;
+
 Scene* HelloWorld::createScene()
 {
     return HelloWorld::create();
@@ -39,6 +41,20 @@ bool HelloWorld::init()
     // 接続開始
     mWebsocket->connect();
      */
+    
+    auto request = new HttpRequest();
+    
+    request->setUrl("https://www.yahoo.co.jp/");
+    request->setRequestType(HttpRequest::Type::GET);
+    request->setResponseCallback([this](HttpClient* client, HttpResponse* response){
+        log("responseCode:%ld %s", response->getResponseCode(), response->getHttpRequest()->getUrl());
+        std::vector<char>* data = response->getResponseData();
+        std::string result(data->begin(), data->end());
+        log(result.c_str());
+    });
+    
+    HttpClient::getInstance()->send(request);
+    request->release();
     
     
     auto visibleSize = Director::getInstance()->getVisibleSize();
