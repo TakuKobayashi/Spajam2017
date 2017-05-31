@@ -2,9 +2,13 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "WebSocket.h"
 
 class HelloWorld : public cocos2d::Scene
 {
+private:
+    //WebSocket* mWebsocket;
+
 public:
     static cocos2d::Scene* createScene();
 

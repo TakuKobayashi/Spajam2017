@@ -17,6 +17,29 @@ bool HelloWorld::init()
     {
         return false;
     }
+
+    /*
+    log("-----------------------------------------------------------");
+    // インスタンス生成
+    mWebsocket = new WebSocket("wss://websocketapisample.herokuapp.com");
+    
+    // イベント設定
+    mWebsocket->onConnectionOpened = []() {
+        log("connection!!!!");
+        // do something
+    };
+    mWebsocket->onMessageReceived = [](std::string message) {
+        log("%s",message.c_str());
+    };
+    mWebsocket->onConnectionClosed = []() {
+        log("closed!!!!");
+        // do something
+    };
+    
+    // 接続開始
+    mWebsocket->connect();
+     */
+    
     
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
