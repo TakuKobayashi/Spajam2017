@@ -50,7 +50,7 @@ bool HelloWorld::init()
         log("responseCode:%ld %s", response->getResponseCode(), response->getHttpRequest()->getUrl());
         std::vector<char>* data = response->getResponseData();
         std::string result(data->begin(), data->end());
-        log(result.c_str());
+        log("%s", result.c_str());
     });
     
     HttpClient::getInstance()->send(request);
