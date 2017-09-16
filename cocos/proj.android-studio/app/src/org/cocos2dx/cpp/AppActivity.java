@@ -82,7 +82,7 @@ public class AppActivity extends Cocos2dxActivity {
         }
         SurfaceView preview = new SurfaceView(this);
         preview.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        mFrameLayout.addView(preview, 0);
+        mFrameLayout.addView(preview);
         SurfaceHolder holder = preview.getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
 
