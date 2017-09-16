@@ -3,8 +3,6 @@
 
 USING_NS_CC;
 
-using namespace cocos2d::network;
-
 Scene* HelloWorld::createScene()
 {
     return HelloWorld::create();
@@ -19,43 +17,6 @@ bool HelloWorld::init()
     {
         return false;
     }
-
-    /*
-    log("-----------------------------------------------------------");
-    // インスタンス生成
-    mWebsocket = new WebSocket("wss://websocketapisample.herokuapp.com");
-    
-    // イベント設定
-    mWebsocket->onConnectionOpened = []() {
-        log("connection!!!!");
-        // do something
-    };
-    mWebsocket->onMessageReceived = [](std::string message) {
-        log("%s",message.c_str());
-    };
-    mWebsocket->onConnectionClosed = []() {
-        log("closed!!!!");
-        // do something
-    };
-    
-    // 接続開始
-    mWebsocket->connect();
-     */
-    
-    auto request = new HttpRequest();
-    
-    request->setUrl("https://www.yahoo.co.jp/");
-    request->setRequestType(HttpRequest::Type::GET);
-    request->setResponseCallback([this](HttpClient* client, HttpResponse* response){
-        log("responseCode:%ld %s", response->getResponseCode(), response->getHttpRequest()->getUrl());
-        std::vector<char>* data = response->getResponseData();
-        std::string result(data->begin(), data->end());
-        log("%s", result.c_str());
-    });
-    
-    HttpClient::getInstance()->send(request);
-    request->release();
-    
     
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -84,23 +45,23 @@ bool HelloWorld::init()
     // add a label shows "Hello World"
     // create and initialize a label
     
-    //auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
+    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
     
     // position the label on the center of the screen
-    //label->setPosition(Vec2(origin.x + visibleSize.width/2,
-    //                        origin.y + visibleSize.height - label->getContentSize().height));
+    label->setPosition(Vec2(origin.x + visibleSize.width/2,
+                            origin.y + visibleSize.height - label->getContentSize().height));
 
     // add the label as a child to this layer
-    //this->addChild(label, 1);
+    this->addChild(label, 1);
 
     // add "HelloWorld" splash screen"
-    //auto sprite = Sprite::create("HelloWorld.png");
+    auto sprite = Sprite::create("HelloWorld.png");
 
     // position the sprite on the center of the screen
-    //sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+    sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
 
     // add the sprite as a child to this layer
-    //this->addChild(sprite, 0);
+    this->addChild(sprite, 0);
     
     return true;
 }
