@@ -23,7 +23,113 @@ THE SOFTWARE.
 ****************************************************************************/
 package org.cocos2dx.cpp;
 
+import android.hardware.Camera;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.ViewGroup;
+
 import org.cocos2dx.lib.Cocos2dxActivity;
 
+import java.io.IOException;
+
 public class AppActivity extends Cocos2dxActivity {
+    private static final int REQUEST_CODE_CAMERA_PERMISSION = 1;
+    private Camera mCamera;
+    private static int REQUEST_CODE = 1;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Util.requestPermissions(this, REQUEST_CODE_CAMERA_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+
+        if (requestCode != REQUEST_CODE_CAMERA_PERMISSION)
+            return;
+        if(!Util.existConfirmPermissions(this)){
+            setupCamera();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!Util.existConfirmPermissions(this)){
+            setupCamera();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        releaseCamera();
+    }
+
+    private void setupCamera(){
+        try {
+            mCamera = Camera.open(); // attempt to get a Camera instance
+        } catch (Exception e) {
+            // Camera is not available (in use or does not exist)
+            return;
+        }
+        SurfaceView preview = new SurfaceView(this);
+        preview.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mFrameLayout.addView(preview, 0);
+        SurfaceHolder holder = preview.getHolder();
+        holder.addCallback(new SurfaceHolder.Callback() {
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                releaseCamera();
+            }
+
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                if (mCamera != null) {
+                    try {
+                        mCamera.setPreviewDisplay(holder);
+                    } catch (IOException exception) {
+                        releaseCamera();
+                    }
+                }
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                if (mCamera != null) {
+                    try {
+                        mCamera.setPreviewDisplay(holder);
+                    } catch (IOException exception) {
+                        releaseCamera();
+                    }
+                }
+            }
+        });
+        if(Build.VERSION.SDK_INT < 11){
+            holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        }
+        try {
+            mCamera.setPreviewDisplay(holder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mCamera.stopPreview();
+        //今回はフロントカメラのみなのでCameraIdは0のみ使う
+        mCamera.setDisplayOrientation(Util.getCameraDisplayOrientation(this, 0));
+        mCamera.startPreview();
+    }
+
+    private void releaseCamera(){
+        if (mCamera != null){
+            mCamera.cancelAutoFocus();
+            mCamera.stopPreview();
+            mCamera.setPreviewCallback(null);
+            mCamera.release();
+            mCamera = null;
+        };
+    }
 }

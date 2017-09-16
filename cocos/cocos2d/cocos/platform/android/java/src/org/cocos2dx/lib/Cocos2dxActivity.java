@@ -299,6 +299,8 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
     // Methods for/from SuperClass/Interfaces
     // ===========================================================
 
+    public abstract void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults);
+
     @Override
     protected void onResume() {
     	Log.d(TAG, "onResume()");
