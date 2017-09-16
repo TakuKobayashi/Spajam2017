@@ -70,8 +70,12 @@ public class AppActivity extends Cocos2dxActivity {
     }
 
     private void setupCamera(){
+        int cameraId = 0;
+        if(Camera.getNumberOfCameras() > 1){
+            cameraId = 1;
+        }
         try {
-            mCamera = Camera.open(); // attempt to get a Camera instance
+            mCamera = Camera.open(cameraId); // attempt to get a Camera instance
         } catch (Exception e) {
             // Camera is not available (in use or does not exist)
             return;
@@ -119,7 +123,7 @@ public class AppActivity extends Cocos2dxActivity {
         }
         mCamera.stopPreview();
         //今回はフロントカメラのみなのでCameraIdは0のみ使う
-        mCamera.setDisplayOrientation(Util.getCameraDisplayOrientation(this, 0));
+        mCamera.setDisplayOrientation(Util.getCameraDisplayOrientation(this, cameraId));
         mCamera.startPreview();
     }
 
