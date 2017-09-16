@@ -90,6 +90,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     {        
         director->setContentScaleFactor(MIN(smallResolutionSize.height/designResolutionSize.height, smallResolutionSize.width/designResolutionSize.width));
     }
+    director->setClearColor(Color4F(0, 0, 0, 0));
 
     register_all_packages();
 
