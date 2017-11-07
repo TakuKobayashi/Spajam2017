@@ -3,11 +3,11 @@ import org.apache.tools.ant.taskdefs.condition.Os
 apply plugin: 'com.android.application'
 
 android {
-    buildToolsVersion '26.0.2'
     compileSdkVersion PROP_COMPILE_SDK_VERSION.toInteger()
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
-        applicationId "com.taku.kobayashi"
+        applicationId "net.taptappun.taku.kobayashi"
         minSdkVersion PROP_MIN_SDK_VERSION
         targetSdkVersion PROP_TARGET_SDK_VERSION
         versionCode 1
