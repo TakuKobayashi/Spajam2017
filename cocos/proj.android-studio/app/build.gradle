@@ -41,6 +41,7 @@ android {
     }
 
     sourceSets.main {
+        jniLibs.srcDirs = ['jni']
         java.srcDir "src"
         res.srcDir "res"
         manifest.srcFile "AndroidManifest.xml"
@@ -90,6 +91,13 @@ android {
                 }
             }
         }
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
     }
 }
 
