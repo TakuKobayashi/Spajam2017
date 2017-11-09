@@ -38,6 +38,7 @@ public class AppActivity extends Cocos2dxActivity {
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 1;
     private Camera mCamera;
     private static int REQUEST_CODE = 1;
+    private SurfaceView mCameraPreview = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +69,7 @@ public class AppActivity extends Cocos2dxActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(!Util.existConfirmPermissions(this)){
+        if(!Util.existConfirmPermissions(this) && mCameraPreview != null){
             setupCamera();
         }
     }
@@ -79,7 +80,7 @@ public class AppActivity extends Cocos2dxActivity {
         releaseCamera();
     }
 
-    private void setupCamera(){
+    public void setupCamera(){
         int cameraId = 0;
         if(Camera.getNumberOfCameras() > 1){
             cameraId = 1;
@@ -90,10 +91,12 @@ public class AppActivity extends Cocos2dxActivity {
             // Camera is not available (in use or does not exist)
             return;
         }
-        SurfaceView preview = new SurfaceView(this);
-        preview.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        mFrameLayout.addView(preview);
-        SurfaceHolder holder = preview.getHolder();
+        if(mCameraPreview == null){
+            mCameraPreview = new SurfaceView(this);
+            mCameraPreview.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            mFrameLayout.addView(mCameraPreview);
+        }
+        SurfaceHolder holder = mCameraPreview.getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
 
             @Override
@@ -135,6 +138,12 @@ public class AppActivity extends Cocos2dxActivity {
         //今回はフロントカメラのみなのでCameraIdは0のみ使う
         mCamera.setDisplayOrientation(Util.getCameraDisplayOrientation(this, cameraId));
         mCamera.startPreview();
+    }
+
+    public void closeCamera(){
+        mFrameLayout.removeView(mCameraPreview);
+        mCameraPreview = null;
+        releaseCamera();
     }
 
     private void releaseCamera(){
