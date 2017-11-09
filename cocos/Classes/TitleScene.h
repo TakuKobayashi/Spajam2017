@@ -1,7 +1,8 @@
-#ifndef __HELLOWORLD_SCENE_H__
-#define __HELLOWORLD_SCENE_H__
+#ifndef __TITLE_SCENE_H__
+#define __TITLE_SCENE_H__
 
 #include "cocos2d.h"
+#include "PlayListScene.h"
 
 class TitleScene : public cocos2d::Scene
 {
@@ -17,4 +18,4 @@ public:
     CREATE_FUNC(TitleScene);
 };
 
-#endif // __HELLOWORLD_SCENE_H__
+#endif

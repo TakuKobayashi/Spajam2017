@@ -91,6 +91,13 @@ bool TitleScene::init()
         // add the sprite as a child to this layer
         this->addChild(sprite, 0);
     }
+
+    auto start_button = Sprite::create("ui/spotify_login_button.png");
+    closeItem->setPosition(Vec2(visibleSize.width/2 + origin.x, origin.y + start_button->getContentSize().height/2));
+    auto start_button_menu = MenuItemSprite::create(start_button, start_button, [this](Ref* sender){
+        //シーン移動
+        Director::getInstance()->replaceScene(PlayListScene::create());
+    });
     return true;
 }
 
