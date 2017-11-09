@@ -61,7 +61,7 @@ public class AppActivity extends Cocos2dxActivity {
 
         if (requestCode != REQUEST_CODE_CAMERA_PERMISSION)
             return;
-        if(!Util.existConfirmPermissions(this)){
+        if(!Util.existConfirmPermissions(this) && mCameraPreview != null){
             setupCamera();
         }
     }
