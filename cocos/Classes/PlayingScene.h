@@ -8,6 +8,10 @@
 #include "cocos2d.h"
 
 class PlayingScene : public cocos2d::Scene{
+public:
+    static cocos2d::Scene* createScene(int index);
+    virtual bool init();
+    CREATE_FUNC(PlayingScene);
 };
 
 

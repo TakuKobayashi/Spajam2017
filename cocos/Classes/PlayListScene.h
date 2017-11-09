@@ -3,10 +3,11 @@
 
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
+#include "PlayingScene.h"
 
 class PlayListScene : public cocos2d::Scene{
 private:
-    cocos2d::ui::Layout* playlistCellContainer();
+    cocos2d::ui::Layout* playlistCellContainer(int position);
 
 public:
     static cocos2d::Scene* createScene();
