@@ -41,7 +41,6 @@ android {
     }
 
     sourceSets.main {
-        jniLibs.srcDirs = ['jni']
         java.srcDir "src"
         res.srcDir "res"
         manifest.srcFile "AndroidManifest.xml"
