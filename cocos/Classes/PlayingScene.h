@@ -10,9 +10,13 @@
 #include "ui/CocosGUI.h"
 
 class PlayingScene : public cocos2d::Scene{
+private:
+    float mTime = 0;
+
 public:
     static cocos2d::Scene* createScene(int index);
     virtual bool init();
+    void update(float dt) override;
     CREATE_FUNC(PlayingScene);
 };
 

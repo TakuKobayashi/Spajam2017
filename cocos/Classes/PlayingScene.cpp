@@ -4,7 +4,6 @@ USING_NS_CC;
 
 Scene* PlayingScene::createScene(int index)
 {
-    log("%d", index);
     return PlayingScene::create();
 }
 
@@ -43,5 +42,12 @@ bool PlayingScene::init()
         }
     };
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(systemButtonListener, this);
+    this->scheduleUpdate();
+
     return true;
+}
+
+void PlayingScene::update(float dt){
+    mTime += dt;
+    log(mTime);
 }
