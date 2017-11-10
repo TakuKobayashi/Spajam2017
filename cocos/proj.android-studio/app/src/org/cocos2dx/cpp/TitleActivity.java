@@ -48,9 +48,7 @@ public class TitleActivity extends Activity {
             Uri uri = receiveIntent.getData();
             String user_token = uri.getQueryParameter("user_token");
             Cocos2dxLocalStorage.setItem("user_token", user_token);
-            Intent intent = new Intent(TitleActivity.this, AppActivity.class);
-            finish();
-            startActivity(intent);
+            startPlayList();
         }
 
         Util.requestPermissions(this, REQUEST_CODE_CAMERA_PERMISSION);
@@ -71,7 +69,8 @@ public class TitleActivity extends Activity {
                     ImageView pressImage = (ImageView) v;
                     Util.releaseImageView(pressImage);
                     pressImage.setImageResource(R.mipmap.spotify_login_button);
-                    showLoginWebView();
+                    startPlayList();
+                    //showLoginWebView();
                 }
                 return true;
             }
@@ -101,6 +100,12 @@ public class TitleActivity extends Activity {
             }
         });
         mLoginWebview.loadUrl("https://taptappun.net/egaonotatsuzin/authentication/sign_in");
+    }
+
+    private void startPlayList(){
+        Intent intent = new Intent(TitleActivity.this, AppActivity.class);
+        finish();
+        startActivity(intent);
     }
 
     @Override
