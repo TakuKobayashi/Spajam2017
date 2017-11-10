@@ -2,9 +2,12 @@ package org.cocos2dx.cpp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -12,17 +15,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
 import net.taptappun.taku.kobayashi.R;
 
 import org.cocos2dx.lib.Cocos2dxActivity;
+import org.cocos2dx.lib.Cocos2dxLocalStorage;
 
 import java.io.IOException;
 
 public class TitleActivity extends Activity {
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 1;
     private static int REQUEST_CODE = 1;
+    private WebView mLoginWebview;
+    private boolean mIsStartLogin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +40,23 @@ public class TitleActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.title_view);
 
+        // ディープリンクから起動されたことを取得する
+        Intent receiveIntent = getIntent();
+        String action = receiveIntent.getAction();
+        if (Intent.ACTION_VIEW.equals(action)){
+            // 呼び出されたディープリンクのURLを取得する
+            Uri uri = receiveIntent.getData();
+            String user_token = uri.getQueryParameter("user_token");
+            Cocos2dxLocalStorage.setItem("user_token", user_token);
+            Intent intent = new Intent(TitleActivity.this, AppActivity.class);
+            finish();
+            startActivity(intent);
+        }
+
         Util.requestPermissions(this, REQUEST_CODE_CAMERA_PERMISSION);
+
+        mLoginWebview = (WebView) findViewById(R.id.login_webview);
+        mLoginWebview.setVisibility(View.INVISIBLE);
 
         ImageView loginButton = (ImageView) findViewById(R.id.login_button);
         loginButton.setImageResource(R.mipmap.spotify_login_button);
@@ -47,13 +71,47 @@ public class TitleActivity extends Activity {
                     ImageView pressImage = (ImageView) v;
                     Util.releaseImageView(pressImage);
                     pressImage.setImageResource(R.mipmap.spotify_login_button);
-                    Intent intent = new Intent(TitleActivity.this, AppActivity.class);
-                    finish();
-                    startActivity(intent);
+                    showLoginWebView();
                 }
                 return true;
             }
         });
+    }
+
+    private void showLoginWebView(){
+        mIsStartLogin = true;
+        mLoginWebview.setVisibility(View.VISIBLE);
+        mLoginWebview.getSettings().setJavaScriptEnabled(true);
+        mLoginWebview.setWebViewClient(new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return super.shouldOverrideUrlLoading(view, url);
+            }
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                setProgressBarIndeterminateVisibility(true);
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                setProgressBarIndeterminateVisibility(false);
+            }
+        });
+        mLoginWebview.loadUrl("https://taptappun.net/egaonotatsuzin/authentication/sign_in");
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode== KeyEvent.KEYCODE_BACK && mLoginWebview.getVisibility() == View.VISIBLE){
+            Util.releaseWebView(mLoginWebview);
+            mLoginWebview.setVisibility(View.INVISIBLE);
+            mIsStartLogin = false;
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -71,11 +129,15 @@ public class TitleActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        if(mIsStartLogin){
+            finish();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Util.releaseImageView((ImageView) findViewById(R.id.login_button));
+        Util.releaseWebView(mLoginWebview);
     }
 }
