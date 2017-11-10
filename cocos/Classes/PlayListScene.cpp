@@ -25,18 +25,19 @@ bool PlayListScene::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     auto playlistView = ui::ListView::create();
+    // これがないとうまく表示されない
     playlistView->setClippingEnabled(false);
     playlistView->setTouchEnabled(true);
     playlistView->setDirection(ui::ListView::Direction::VERTICAL);
-    playlistView->setPosition(Vec2::ZERO);
     for(int i = 0;i < 100;++i){
         playlistView->pushBackCustomItem(playlistCellContainer(i));
     }
-    playlistView->setPosition(Vec2(origin.x + playlistView->getContentSize().width / 2, origin.y + visibleSize.height));
-    playlistView->addEventListener([](Ref *ref, ui::ListView::EventType eventType){
-        auto listView = static_cast<ui::ListView*>(ref);
-        log("select %d", int(listView->getCurSelectedIndex()));
+    // Sizeを指定しないとScrollとして機能しない
+    playlistView->setContentSize(visibleSize);
+    playlistView->setPosition(Vec2(origin.x, origin.y));
+    playlistView->addEventListener([playlistView](Ref *ref, ui::ListView::EventType eventType){
         if (eventType == ui::ListView::EventType::ON_SELECTED_ITEM_END) {
+            auto listView = static_cast<ui::ListView*>(ref);
             auto playingScene = PlayingScene::createScene(int(listView->getCurSelectedIndex()));
             Director::getInstance()->replaceScene(playingScene);
         }
@@ -52,7 +53,8 @@ ui::Layout* PlayListScene::playlistCellContainer(int position){
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
     ui::Layout* celllayout = ui::Layout::create();
-
+    // 子供もTouchEnableしないとListのタップが有効にならない
+    celllayout->setTouchEnabled(true);
     ui::Text* soundTitleLabel = ui::Text::create(StringUtils::format("hogehoge %d", position), "fonts/arial.ttf", 16);
     soundTitleLabel->setColor(Color3B(255,0,0));
     soundTitleLabel->setPosition(Vec2(soundTitleLabel->getContentSize().width / 2, soundTitleLabel->getContentSize().height / 2));
