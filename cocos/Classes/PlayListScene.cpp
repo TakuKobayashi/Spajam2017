@@ -45,6 +45,15 @@ bool PlayListScene::init()
     this->addChild(playlistView);
     playlistView->requestDoLayout();
 
+    auto systemButtonListener = EventListenerKeyboard::create();
+    systemButtonListener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event)
+    {
+        if (keyCode == EventKeyboard::KeyCode::KEY_BACK)
+        {
+            Director::getInstance()->end();
+        }
+    };
+    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(systemButtonListener, this);
     return true;
 }
 

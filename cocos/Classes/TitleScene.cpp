@@ -36,6 +36,18 @@ bool TitleScene::init()
     auto playlistSceneMenu = Menu::create(start_button_menu, NULL);
     playlistSceneMenu->setPosition(Vec2(visibleSize.width/2 + origin.x, origin.y + start_button->getContentSize().height/2));
     this->addChild(playlistSceneMenu, 1);
+
+
+    // android back press event
+    auto systemButtonListener = EventListenerKeyboard::create();
+    systemButtonListener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event)
+    {
+        if (keyCode == EventKeyboard::KeyCode::KEY_BACK)
+        {
+            Director::getInstance()->end();
+        }
+    };
+    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(systemButtonListener, this);
     return true;
 }
 

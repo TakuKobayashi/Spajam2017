@@ -6,6 +6,7 @@
 #define PROJ_ANDROID_STUDIO_PLAYINGSCENE_H
 
 #include "cocos2d.h"
+#include "PlayListScene.h"
 
 class PlayingScene : public cocos2d::Scene{
 public:
