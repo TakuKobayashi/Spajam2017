@@ -7,6 +7,7 @@
 
 #include "cocos2d.h"
 #include "PlayListScene.h"
+#include "ui/CocosGUI.h"
 
 class PlayingScene : public cocos2d::Scene{
 public:
