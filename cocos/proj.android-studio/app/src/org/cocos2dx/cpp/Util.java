@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.os.Build;
@@ -75,59 +76,15 @@ public class Util {
 		return 90;
 	}
 
-	public static boolean checkCameraHardware(Context context) {
-		if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-			// this device has a camera
-			return true;
-		} else {
-			// no camera on this device
-			return false;
-		}
-	}
-
-	public static String makeUrlParams(Bundle params){
-		Set<String> keys = params.keySet();
-		ArrayList<String> paramList = new ArrayList<String>();
-		for (String key : keys) {
-			paramList.add(key + "=" + params.get(key).toString());
-		}
-		return Util.join(paramList, "&");
-	}
-
-	public static String makeUrlParams(Map<String, Object> params){
-		Set<String> keys = params.keySet();
-		ArrayList<String> paramList = new ArrayList<String>();
-		for(Map.Entry<String, Object> e : params.entrySet()) {
-			paramList.add(e.getKey() + "=" + e.getValue().toString());
-		}
-		return Util.join(paramList, "&");
-	}
-
-	public static String join(String[] list, String with) {
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < list.length; i++) {
-			if (i != 0) { buf.append(with);}
-			buf.append(list[i]);
-		}
-		return buf.toString();
-	}
-
-	public static String join(ArrayList<String> list, String with) {
-		StringBuffer buf = new StringBuffer();
-		for (int i = 0; i < list.size(); i++) {
-			if (i != 0) { buf.append(with);}
-			buf.append(list.get(i));
-		}
-		return buf.toString();
-	}
-
 	public static ArrayList<PermissionInfo> getSettingPermissions(Context context){
 		ArrayList<PermissionInfo> list = new ArrayList<PermissionInfo>();
 		PackageInfo packageInfo = null;
 		try {
 			packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS);
-			for(String permission : packageInfo.requestedPermissions){
-				list.add(context.getPackageManager().getPermissionInfo(permission, PackageManager.GET_META_DATA));
+			if(packageInfo.requestedPermissions != null){
+				for(String permission : packageInfo.requestedPermissions){
+					list.add(context.getPackageManager().getPermissionInfo(permission, PackageManager.GET_META_DATA));
+				}
 			}
 		} catch (PackageManager.NameNotFoundException e) {
 			e.printStackTrace();
@@ -170,56 +127,27 @@ public class Util {
 		return true;
 	}
 
-	public static String loadTextFromAsset(Context con, String fileName) {
-
-		AssetManager mngr = con.getAssets();
-		//rawフォルダにあるファイルのリソースでの読み込み
-		String str;
+	public static Bitmap loadImageFromAsset(Context context, String path){
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		AssetManager mngr = context.getAssets();
 		try {
-			InputStream is = mngr.open(fileName);
-			str = Util.Is2String(is);
+			InputStream is = mngr.open(path);
+			Bitmap image = BitmapFactory.decodeStream(is, null, options);
+			return image;
 		} catch (IOException e) {
-			str = "";
-		}
-		return str;
-	}
-
-	public static String Is2String(InputStream in) throws IOException {
-		//入力されたテキストデータ(InputStream,これはbyteデータ)を文字列(String)に変換
-
-		StringBuffer out = new StringBuffer();
-		byte[] b = new byte[4096];
-		//保持しているStringデータ全てをStringBufferに入れる
-		for (int n; (n = in.read(b)) != -1;) {
-			out.append(new String(b, 0, n));
-		}
-		return out.toString();
-	}
-
-	public static String encodeToJPEGbase64(Bitmap image)
-	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-		byte[] b = baos.toByteArray();
-		String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
-		return imageEncoded;
-	}
-
-	public static <T> T getClassByField(Object object, Class<T> targetClass) {
-		Field[] declaredFields = object.getClass().getDeclaredFields();
-
-		for (Field field : declaredFields) {
-			if (field.getType() == targetClass) {
-				field.setAccessible(true);
-				try {
-					T target = (T) field.get(object);
-					return target;
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-				break;
-			}
+			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static String[] loadFilePathes(Context context, String path){
+		AssetManager mngr = context.getAssets();
+		try {
+			return  mngr.list(path);
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		return new String[]{};
 	}
 }
