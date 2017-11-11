@@ -42,6 +42,21 @@ bool PlayingScene::init()
     targetImage->setPosition(Vec2(origin.x + targetImageBoxSize.width / 2, laneHeight + origin.y + targetImageBoxSize.height / 2));
     this->addChild(targetImage);
 
+    auto scoreBarBase = ui::ImageView::create("images/ui/frame.png");
+    scoreBarBase->setScale(baseScale);
+    Size scoreBarBaseBoxSize = scoreBarBase->getBoundingBox().size;
+    scoreBarBase->setPosition(Vec2(origin.x + visibleSize.width - scoreBarBaseBoxSize.width / 2, origin.y + visibleSize.height - scoreBarBaseBoxSize.height / 2));
+    this->addChild(scoreBarBase);
+
+    Vec2 scoreBarPadding = Vec2(1 * baseScale, 1 * baseScale);
+    auto scoreBar = ui::LoadingBar::create("images/ui/gauge.png");
+    scoreBar->setScale(baseScale);
+    Size scoreBarBoxSize = scoreBar->getBoundingBox().size;
+    scoreBar->setPosition(Vec2(origin.x + visibleSize.width - (scoreBarBoxSize.width / 2) - scoreBarPadding.x,origin.y + visibleSize.height - (scoreBarBoxSize.height / 2) - scoreBarPadding.y));
+    scoreBar->setPercent(50);
+    this->addChild(scoreBar);
+
+    this->scheduleUpdate();
     auto systemButtonListener = EventListenerKeyboard::create();
     systemButtonListener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event)
     {
@@ -51,7 +66,6 @@ bool PlayingScene::init()
         }
     };
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(systemButtonListener, this);
-    this->scheduleUpdate();
 
     return true;
 }
