@@ -13,6 +13,8 @@ bool PlayingScene::init()
     {
         return false;
     }
+    ui::LoadingBar* mScoreBar;
+
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     log("width %f, height %f", visibleSize.width, visibleSize.height);
@@ -49,12 +51,12 @@ bool PlayingScene::init()
     this->addChild(scoreBarBase);
 
     Vec2 scoreBarPadding = Vec2(1 * baseScale, 1 * baseScale);
-    auto scoreBar = ui::LoadingBar::create("images/ui/gauge.png");
-    scoreBar->setScale(baseScale);
-    Size scoreBarBoxSize = scoreBar->getBoundingBox().size;
-    scoreBar->setPosition(Vec2(origin.x + visibleSize.width - (scoreBarBoxSize.width / 2) - scoreBarPadding.x,origin.y + visibleSize.height - (scoreBarBoxSize.height / 2) - scoreBarPadding.y));
-    scoreBar->setPercent(50);
-    this->addChild(scoreBar);
+    mScoreBar = ui::LoadingBar::create("images/ui/gauge.png");
+    mScoreBar->setScale(baseScale);
+    Size scoreBarBoxSize = mScoreBar->getBoundingBox().size;
+    mScoreBar->setPosition(Vec2(origin.x + visibleSize.width - (scoreBarBoxSize.width / 2) - scoreBarPadding.x,origin.y + visibleSize.height - (scoreBarBoxSize.height / 2) - scoreBarPadding.y));
+    mScoreBar->setPercent(50);
+    this->addChild(mScoreBar);
 
     this->scheduleUpdate();
     auto systemButtonListener = EventListenerKeyboard::create();

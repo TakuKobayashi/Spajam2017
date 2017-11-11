@@ -11,6 +11,7 @@
 
 class PlayingScene : public cocos2d::Scene{
 private:
+    cocos2d::ui::LoadingBar mScoreBar;
     float mTime = 0;
 
 public:
