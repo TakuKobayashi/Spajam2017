@@ -17,6 +17,15 @@ bool PlayingScene::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     log("width %f, height %f", visibleSize.width, visibleSize.height);
 
+//    auto webView = cocos2d::experimental::ui::WebView::create();
+//    webView->loadURL("https://www.yahoo.co.jp");
+
+    // ポジションとサイズを調整
+//    Size screen = Director::getInstance()->getOpenGLView()->getDesignResolutionSize();
+//    webView->setContentSize(Size(screen.width, screen.height));
+//    webView->setPosition(Vec2(screen.width / 2, screen.height/2));
+//    this->addChild(webView);
+
     auto bgImage = ui::ImageView::create("images/ui/bg.png");
     float baseScale = std::max(visibleSize.width / bgImage->getContentSize().width, visibleSize.height / bgImage->getContentSize().height);
     bgImage->setScale(baseScale);
