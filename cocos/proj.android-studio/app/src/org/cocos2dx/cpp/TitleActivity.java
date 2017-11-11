@@ -57,18 +57,18 @@ public class TitleActivity extends Activity {
         mLoginWebview.setVisibility(View.INVISIBLE);
 
         ImageView loginButton = (ImageView) findViewById(R.id.login_button);
-        loginButton.setImageResource(R.mipmap.spotify_login_button);
+        loginButton.setImageBitmap(Util.loadImageFromAsset(TitleActivity.this, "images/ui/spotify_login_button.png"));
         loginButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if(event.getAction() == MotionEvent.ACTION_DOWN){
                     ImageView pressImage = (ImageView) v;
                     Util.releaseImageView(pressImage);
-                    pressImage.setImageResource(R.mipmap.spotify_login_button_press);
+                    pressImage.setImageBitmap(Util.loadImageFromAsset(TitleActivity.this, "images/ui/spotify_login_button_press.png"));
                 }else if(event.getAction() == MotionEvent.ACTION_UP){
                     ImageView pressImage = (ImageView) v;
                     Util.releaseImageView(pressImage);
-                    pressImage.setImageResource(R.mipmap.spotify_login_button);
+                    pressImage.setImageBitmap(Util.loadImageFromAsset(TitleActivity.this, "images/ui/spotify_login_button.png"));
                     startPlayList();
                     //showLoginWebView();
                 }
