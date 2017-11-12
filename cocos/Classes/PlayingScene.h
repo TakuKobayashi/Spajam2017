@@ -13,6 +13,8 @@ class PlayingScene : public cocos2d::Scene{
 private:
     cocos2d::ui::LoadingBar mScoreBar;
     float mTime = 0;
+    float mBaseScale = 1.0f;
+    void fireBeatBall();
 
 public:
     static cocos2d::Scene* createScene(int index);

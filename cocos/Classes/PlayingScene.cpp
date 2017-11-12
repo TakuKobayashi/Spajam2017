@@ -29,30 +29,30 @@ bool PlayingScene::init()
 //    this->addChild(webView);
 
     auto bgImage = ui::ImageView::create("images/ui/bg.png");
-    float baseScale = std::max(visibleSize.width / bgImage->getContentSize().width, visibleSize.height / bgImage->getContentSize().height);
-    bgImage->setScale(baseScale);
+    mBaseScale = std::max(visibleSize.width / bgImage->getContentSize().width, visibleSize.height / bgImage->getContentSize().height);
+    bgImage->setScale(mBaseScale);
 
     Size bgImageBounseBoxSize = bgImage->getBoundingBox().size;
     bgImage->setPosition(Vec2(origin.x + bgImageBounseBoxSize.width / 2, origin.y + bgImageBounseBoxSize.height / 2));
     this->addChild(bgImage);
 
-    float laneHeight = 11 * baseScale;
+    float laneHeight = 11 * mBaseScale;
 
     auto targetImage = ui::ImageView::create("images/ui/target.png");
-    targetImage->setScale(baseScale);
+    targetImage->setScale(mBaseScale);
     Size targetImageBoxSize = targetImage->getBoundingBox().size;
     targetImage->setPosition(Vec2(origin.x + targetImageBoxSize.width / 2, laneHeight + origin.y + targetImageBoxSize.height / 2));
     this->addChild(targetImage);
 
     auto scoreBarBase = ui::ImageView::create("images/ui/frame.png");
-    scoreBarBase->setScale(baseScale);
+    scoreBarBase->setScale(mBaseScale);
     Size scoreBarBaseBoxSize = scoreBarBase->getBoundingBox().size;
     scoreBarBase->setPosition(Vec2(origin.x + visibleSize.width - scoreBarBaseBoxSize.width / 2, origin.y + visibleSize.height - scoreBarBaseBoxSize.height / 2));
     this->addChild(scoreBarBase);
 
-    Vec2 scoreBarPadding = Vec2(1 * baseScale, 1 * baseScale);
+    Vec2 scoreBarPadding = Vec2(1 * mBaseScale, 1 * mBaseScale);
     mScoreBar = ui::LoadingBar::create("images/ui/gauge.png");
-    mScoreBar->setScale(baseScale);
+    mScoreBar->setScale(mBaseScale);
     Size scoreBarBoxSize = mScoreBar->getBoundingBox().size;
     mScoreBar->setPosition(Vec2(origin.x + visibleSize.width - (scoreBarBoxSize.width / 2) - scoreBarPadding.x,origin.y + visibleSize.height - (scoreBarBoxSize.height / 2) - scoreBarPadding.y));
     mScoreBar->setPercent(50);
@@ -68,8 +68,23 @@ bool PlayingScene::init()
         }
     };
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(systemButtonListener, this);
-
+    fireBeatBall();
     return true;
+}
+
+void PlayingScene::fireBeatBall(){
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    auto beatBall = Sprite::create("images/tamaA.png");
+    beatBall->setScale(mBaseScale);
+    float laneHeight = 11 * mBaseScale;
+    Size beatBallBoxSize = beatBall->getBoundingBox().size;
+    beatBall->setPosition(Vec2(origin.x + visibleSize.width + (beatBallBoxSize.width / 2), laneHeight + origin.y + beatBallBoxSize.height / 2));
+    this->addChild(beatBall);
+    auto moveAction = MoveTo::create(2, Vec2(-(beatBallBoxSize.width / 2),laneHeight + origin.y + beatBallBoxSize.height / 2));
+    beatBall->runAction(Sequence::create(moveAction, [this, beatBall]{
+        this->removeChild(beatBall);
+    }, NULL) );
 }
 
 void PlayingScene::update(float dt){
