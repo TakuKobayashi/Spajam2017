@@ -23,12 +23,19 @@ THE SOFTWARE.
 ****************************************************************************/
 package org.cocos2dx.cpp;
 
+import android.content.Context;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
+
+import com.google.android.gms.vision.MultiProcessor;
+import com.google.android.gms.vision.Tracker;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
 
 import org.cocos2dx.lib.Cocos2dxActivity;
 
@@ -54,105 +61,97 @@ public class AppActivity extends Cocos2dxActivity {
         }
         // DO OTHER INITIALIZATION BELOW
         Util.requestPermissions(this, REQUEST_CODE_CAMERA_PERMISSION);
+        gApplicationContext = this.getApplicationContext();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-
         if (requestCode != REQUEST_CODE_CAMERA_PERMISSION)
             return;
-        if(!Util.existConfirmPermissions(this) && mCameraPreview != null){
-            setupCamera();
+        if(!Util.existConfirmPermissions(this) && mIsCameraActivate){
+            startFaceDetectCamera();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(!Util.existConfirmPermissions(this) && mCameraPreview != null){
-            setupCamera();
+        if(!Util.existConfirmPermissions(this) && mIsCameraActivate){
+            startFaceDetectCamera();
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        releaseCamera();
+        releaseFaceDetectCamera();
     }
 
-    public void setupCamera(){
-        int cameraId = 0;
-        if(Camera.getNumberOfCameras() > 1){
-            cameraId = 1;
-        }
-        try {
-            mCamera = Camera.open(cameraId); // attempt to get a Camera instance
-        } catch (Exception e) {
-            // Camera is not available (in use or does not exist)
-            return;
-        }
-        if(mCameraPreview == null){
-            mCameraPreview = new SurfaceView(this);
-            mCameraPreview.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            mFrameLayout.addView(mCameraPreview);
-        }
-        SurfaceHolder holder = mCameraPreview.getHolder();
-        holder.addCallback(new SurfaceHolder.Callback() {
+    //---------------------------------------------------------------------------------------------------------------------------------
+    // TODO Management
+    private static boolean mIsCameraActivate = false;
+    private static Context gApplicationContext;
+    private static CameraWrapper gCamera = null;
 
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                releaseCamera();
-            }
+    public static void startCamera(){
+        mIsCameraActivate = true;
+        startFaceDetectCamera();
+    }
 
+    private static void startFaceDetectCamera(){
+        if(gCamera == null){
+            gCamera = new CameraWrapper();
+        }
+
+        MultiProcessor.Builder multiprocessorBuilder = new MultiProcessor.Builder<>(new MultiProcessor.Factory<Face>() {
             @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                if (mCamera != null) {
-                    try {
-                        mCamera.setPreviewDisplay(holder);
-                    } catch (IOException exception) {
-                        releaseCamera();
+            public Tracker<Face> create(Face face) {
+                return new Tracker<Face>() {
+                    @Override
+                    public void onNewItem(int faceId, Face item) {
+                        Log.d(Config.TAG, "newItem");
                     }
-                }
-            }
 
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                if (mCamera != null) {
-                    try {
-                        mCamera.setPreviewDisplay(holder);
-                    } catch (IOException exception) {
-                        releaseCamera();
+                    @Override
+                    public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
+                        Log.d(Config.TAG, "update");
                     }
-                }
+
+                    @Override
+                    public void onMissing(FaceDetector.Detections<Face> detectionResults) {
+                        Log.d(Config.TAG, "missing");
+                    }
+
+                    @Override
+                    public void onDone() {
+                        Log.d(Config.TAG, "done");
+                    }
+                };
             }
         });
-        if(Build.VERSION.SDK_INT < 11){
-            holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        }
-        try {
-            mCamera.setPreviewDisplay(holder);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        mCamera.stopPreview();
-        //今回はフロントカメラのみなのでCameraIdは0のみ使う
-        mCamera.setDisplayOrientation(Util.getCameraDisplayOrientation(this, cameraId));
-        mCamera.startPreview();
+
+        FaceDetector detector = new FaceDetector.Builder(gApplicationContext)
+                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                .setTrackingEnabled(true)
+                .build();
+        detector.setProcessor(multiprocessorBuilder.build());
+
+        CameraDetectorThread detectorThread = new CameraDetectorThread(detector);
+        gCamera.setDetectorThread(detectorThread);
+        gCamera.start();
     }
 
-    public void closeCamera(){
-        mFrameLayout.removeView(mCameraPreview);
-        mCameraPreview = null;
-        releaseCamera();
+    public static void releaseCamera(){
+        mIsCameraActivate = false;
+        releaseFaceDetectCamera();
     }
 
-    private void releaseCamera(){
-        if (mCamera != null){
-            mCamera.cancelAutoFocus();
-            mCamera.stopPreview();
-            mCamera.setPreviewCallback(null);
-            mCamera.release();
-            mCamera = null;
-        };
+    private static void releaseFaceDetectCamera(){
+        if(gCamera != null) {
+            gCamera.release();
+            gCamera = null;
+        }
     }
+
+    //---------------------------------------------------------------------------------------------------------------------------------
 }
