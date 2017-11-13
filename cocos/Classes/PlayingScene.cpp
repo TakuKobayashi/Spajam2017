@@ -60,15 +60,18 @@ bool PlayingScene::init()
 
     this->scheduleUpdate();
     auto systemButtonListener = EventListenerKeyboard::create();
-    systemButtonListener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event)
+    systemButtonListener->onKeyReleased = [this](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event)
     {
         if (keyCode == EventKeyboard::KeyCode::KEY_BACK)
         {
-            Director::getInstance()->replaceScene(PlayListScene::createScene());
+            this->release();
         }
     };
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(systemButtonListener, this);
     fireBeatBall();
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    NativeAndroidHelper::startCamera();
+#endif
     return true;
 }
 
@@ -85,6 +88,18 @@ void PlayingScene::fireBeatBall(){
     beatBall->runAction(Sequence::create(moveAction, [this, beatBall]{
         this->removeChild(beatBall);
     }, NULL) );
+}
+
+void PlayingScene::beat(){
+    int id = experimental::AudioEngine::play2d("sounds/taiko.mp3", false, 1.0f);
+    log("%d", id);
+}
+
+void PlayingScene::release(){
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    NativeAndroidHelper::releaseCamera();
+#endif
+    Director::getInstance()->replaceScene(PlayListScene::createScene());
 }
 
 void PlayingScene::update(float dt){

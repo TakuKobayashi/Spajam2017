@@ -94,6 +94,7 @@ public class AppActivity extends Cocos2dxActivity {
     private static CameraWrapper gCamera = null;
 
     public static void startCamera(){
+        Log.d(Config.TAG, "startCamera");
         mIsCameraActivate = true;
         startFaceDetectCamera();
     }
@@ -142,6 +143,7 @@ public class AppActivity extends Cocos2dxActivity {
     }
 
     public static void releaseCamera(){
+        Log.d(Config.TAG, "stopCamera");
         mIsCameraActivate = false;
         releaseFaceDetectCamera();
     }

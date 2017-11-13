@@ -8,6 +8,8 @@
 #include "cocos2d.h"
 #include "PlayListScene.h"
 #include "ui/CocosGUI.h"
+#include "audio/include/AudioEngine.h"
+#include "NativeAndroidHelper.h"
 
 class PlayingScene : public cocos2d::Scene{
 private:
@@ -20,6 +22,8 @@ public:
     static cocos2d::Scene* createScene(int index);
     virtual bool init();
     void update(float dt) override;
+    static void beat();
+    void release();
     CREATE_FUNC(PlayingScene);
 };
 
