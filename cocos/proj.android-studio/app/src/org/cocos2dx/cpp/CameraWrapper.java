@@ -48,6 +48,7 @@ public class CameraWrapper {
 		if(mDetectorThread != null){
 			mDetectorThread.startDetect();
 		}
+		Log.d(Config.TAG, "start");
 	}
 
 	private void cameraStartCommon(){
@@ -79,6 +80,7 @@ public class CameraWrapper {
 		mCamera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
 			@Override
 			public void onPreviewFrame(byte[] data, Camera camera) {
+				Log.d(Config.TAG, "previewCallback");
 				if(mDetectorThread != null){
 					mDetectorThread.previewFrame(data, CameraWrapper.this);
 				}

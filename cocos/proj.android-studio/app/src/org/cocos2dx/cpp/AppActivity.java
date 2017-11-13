@@ -32,6 +32,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 
+import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
@@ -59,6 +60,7 @@ public class AppActivity extends Cocos2dxActivity {
         // DO OTHER INITIALIZATION BELOW
         Util.requestPermissions(this, REQUEST_CODE_CAMERA_PERMISSION);
         gApplicationContext = this.getApplicationContext();
+        startFaceDetectCamera();
     }
 
     @Override
@@ -84,22 +86,34 @@ public class AppActivity extends Cocos2dxActivity {
         releaseFaceDetectCamera();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(gCamera != null){
+            gCamera.release();
+            gCamera = null;
+        }
+    }
+
     //---------------------------------------------------------------------------------------------------------------------------------
     // TODO Management
     private static boolean gIsCameraActivate = false;
     private static Context gApplicationContext;
-    private static CameraWrapper gCamera = null;
+    private static CameraSource gCamera = null;
 
     public static void startCamera(){
         Log.d(Config.TAG, "startCamera");
         gIsCameraActivate = true;
-        startFaceDetectCamera();
+        cameraStart();
     }
 
     private static void startFaceDetectCamera(){
+        /*
         if(gCamera == null){
             gCamera = new CameraWrapper();
+            Log.d(Config.TAG, "new");
         }
+        */
 
         MultiProcessor.Builder multiprocessorBuilder = new MultiProcessor.Builder<>(new MultiProcessor.Factory<Face>() {
             @Override
@@ -134,9 +148,25 @@ public class AppActivity extends Cocos2dxActivity {
                 .build();
         detector.setProcessor(multiprocessorBuilder.build());
 
+        gCamera = new CameraSource.Builder(gApplicationContext, detector)
+                .setRequestedPreviewSize(640, 480)
+                .setFacing(CameraSource.CAMERA_FACING_FRONT)
+                .setRequestedFps(30.0f)
+                .build();
+/*
         CameraDetectorThread detectorThread = new CameraDetectorThread(detector);
         gCamera.setDetectorThread(detectorThread);
         gCamera.start();
+*/
+    }
+
+    private static void cameraStart(){
+        try {
+            gCamera.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(Config.TAG, "error:" + e.getMessage());
+        }
     }
 
     public static void releaseCamera(){
@@ -147,8 +177,7 @@ public class AppActivity extends Cocos2dxActivity {
 
     private static void releaseFaceDetectCamera(){
         if(gCamera != null) {
-            gCamera.release();
-            gCamera = null;
+            gCamera.stop();
         }
     }
 
