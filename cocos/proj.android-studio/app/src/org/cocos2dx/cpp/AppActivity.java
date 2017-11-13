@@ -43,9 +43,6 @@ import java.io.IOException;
 
 public class AppActivity extends Cocos2dxActivity {
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 1;
-    private Camera mCamera;
-    private static int REQUEST_CODE = 1;
-    private SurfaceView mCameraPreview = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +65,7 @@ public class AppActivity extends Cocos2dxActivity {
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if (requestCode != REQUEST_CODE_CAMERA_PERMISSION)
             return;
-        if(!Util.existConfirmPermissions(this) && mIsCameraActivate){
+        if(!Util.existConfirmPermissions(this) && gIsCameraActivate){
             startFaceDetectCamera();
         }
     }
@@ -76,7 +73,7 @@ public class AppActivity extends Cocos2dxActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(!Util.existConfirmPermissions(this) && mIsCameraActivate){
+        if(!Util.existConfirmPermissions(this) && gIsCameraActivate){
             startFaceDetectCamera();
         }
     }
@@ -89,13 +86,13 @@ public class AppActivity extends Cocos2dxActivity {
 
     //---------------------------------------------------------------------------------------------------------------------------------
     // TODO Management
-    private static boolean mIsCameraActivate = false;
+    private static boolean gIsCameraActivate = false;
     private static Context gApplicationContext;
     private static CameraWrapper gCamera = null;
 
     public static void startCamera(){
         Log.d(Config.TAG, "startCamera");
-        mIsCameraActivate = true;
+        gIsCameraActivate = true;
         startFaceDetectCamera();
     }
 
@@ -144,7 +141,7 @@ public class AppActivity extends Cocos2dxActivity {
 
     public static void releaseCamera(){
         Log.d(Config.TAG, "stopCamera");
-        mIsCameraActivate = false;
+        gIsCameraActivate = false;
         releaseFaceDetectCamera();
     }
 
