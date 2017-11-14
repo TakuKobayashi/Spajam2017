@@ -161,12 +161,13 @@ public class AppActivity extends Cocos2dxActivity {
 
         FaceDetector detector = new FaceDetector.Builder(gApplicationContext)
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                .setMode(FaceDetector.ACCURATE_MODE)
                 .setTrackingEnabled(true)
                 .build();
         detector.setProcessor(multiprocessorBuilder.build());
 
         gCamera = new CameraSource.Builder(gApplicationContext, detector)
-                .setRequestedPreviewSize(640, 480)
+                .setRequestedPreviewSize(960, 720)
                 .setFacing(CameraSource.CAMERA_FACING_FRONT)
                 .setRequestedFps(30.0f)
                 .build();
