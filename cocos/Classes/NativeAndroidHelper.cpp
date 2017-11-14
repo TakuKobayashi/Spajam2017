@@ -24,8 +24,18 @@ void NativeAndroidHelper::releaseCamera()
     methodInfo.env->DeleteLocalRef(methodInfo.classID);
 }
 
-void NativeAndroidHelper::beat()
+void NativeAndroidHelper::smile(float score)
 {
-    log("beat");
+    PlayingScene::smile(score);
+}
+
+void NativeAndroidHelper::detect()
+{
+    PlayingScene::detect();
+}
+
+void NativeAndroidHelper::gone()
+{
+    PlayingScene::gone();
 }
 #endif

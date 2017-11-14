@@ -94,6 +94,7 @@ android {
 }
 
 repositories {
+    google()
     mavenCentral()
     flatDir {
         dirs 'libs'
@@ -105,4 +106,9 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':libcocos2dx')
     compile 'com.spotify.android:auth:1.0.0-alpha'
+    compile 'com.google.android.exoplayer:exoplayer-core:r2.5.+'
+    compile 'com.google.android.exoplayer:exoplayer-dash:r2.5.+'
+    compile 'com.google.android.exoplayer:exoplayer-hls:r2.5.+'
+    compile 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.5.+'
+    compile 'com.google.android.exoplayer:exoplayer-ui:r2.5.+'
 }

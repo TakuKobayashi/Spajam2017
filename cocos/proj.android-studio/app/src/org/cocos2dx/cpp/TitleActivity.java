@@ -7,10 +7,12 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -18,6 +20,22 @@ import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.LoopingMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.AssetDataSource;
+import com.google.android.exoplayer2.upstream.DataSource;
 
 import net.taptappun.taku.kobayashi.R;
 
@@ -31,6 +49,7 @@ public class TitleActivity extends Activity {
     private static int REQUEST_CODE = 1;
     private WebView mLoginWebview;
     private boolean mIsStartLogin = false;
+    private SimpleExoPlayer mExoPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +94,94 @@ public class TitleActivity extends Activity {
                 return true;
             }
         });
+        initExoPlayer();
     }
+
+    private void initExoPlayer(){
+        TextureView bgVideoView = (TextureView) findViewById(R.id.top_background_video_view);
+
+        mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, new DefaultTrackSelector());
+        mExoPlayer.prepare(loadMediaSource("videos/egao_move.mov"));
+        mExoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
+        mExoPlayer.setVideoTextureView(bgVideoView);
+        mExoPlayer.addListener(new Player.EventListener() {
+            @Override
+            public void onTimelineChanged(Timeline timeline, Object manifest) {
+                Log.d(Config.TAG, "timeline changed:" + timeline + " " + manifest);
+            }
+
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+                Log.d(Config.TAG, "tracks changed:" + trackGroups.length + " " + trackSelections.length);
+            }
+
+            @Override
+            public void onLoadingChanged(boolean isLoading) {
+                Log.d(Config.TAG, "LoadingChanged:" + isLoading);
+            }
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                Log.d(Config.TAG, "PlayerStateChanged:" + playWhenReady + " " + playbackState);
+            }
+
+            @Override
+            public void onRepeatModeChanged(int repeatMode) {
+                Log.d(Config.TAG, "RepeatModeChanged:" + repeatMode);
+            }
+
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+                Log.d(Config.TAG, "PlayerError:" + error.getMessage());
+            }
+
+            @Override
+            public void onPositionDiscontinuity() {
+                Log.d(Config.TAG, "PositionDiscontinuity");
+            }
+
+            @Override
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+                Log.d(Config.TAG, "PlaybackParametersChanged:" + playbackParameters);
+            }
+        });
+        mExoPlayer.addVideoListener(new SimpleExoPlayer.VideoListener() {
+            @Override
+            public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+                Log.d(Config.TAG, "VideoSizeChanged:" + width + " " + height + " " + unappliedRotationDegrees + " " + pixelWidthHeightRatio);
+            }
+
+            @Override
+            public void onRenderedFirstFrame() {
+                Log.d(Config.TAG, "RenderedFirstFrame");
+            }
+        });
+    }
+
+    private MediaSource loadMediaSource(String assetsFileName){
+        DataSource.Factory factory = new DataSource.Factory() {
+            @Override
+            public DataSource createDataSource() {
+                return new AssetDataSource(TitleActivity.this);
+            }
+        };
+        MediaSource videoSource = new ExtractorMediaSource(
+                Uri.parse("file://android_asset/" + assetsFileName),
+                factory,
+                new DefaultExtractorsFactory(),
+                null,
+                new ExtractorMediaSource.EventListener() {
+                    @Override
+                    public void onLoadError(IOException error) {
+                        error.printStackTrace();
+                        Log.d(Config.TAG, error.getMessage());
+                    }
+                }
+        );
+
+        return new LoopingMediaSource(videoSource);
+    }
+
 
     private void showLoginWebView(){
         mIsStartLogin = true;
@@ -110,10 +216,14 @@ public class TitleActivity extends Activity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode== KeyEvent.KEYCODE_BACK && mLoginWebview.getVisibility() == View.VISIBLE){
-            Util.releaseWebView(mLoginWebview);
-            mLoginWebview.setVisibility(View.INVISIBLE);
-            mIsStartLogin = false;
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            if(mLoginWebview.getVisibility() == View.VISIBLE) {
+                Util.releaseWebView(mLoginWebview);
+                mLoginWebview.setVisibility(View.INVISIBLE);
+                mIsStartLogin = false;
+            }else{
+                finish();
+            }
             return true;
         }
         return false;
@@ -129,11 +239,15 @@ public class TitleActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if(!mExoPlayer.isPlayingAd()){
+            mExoPlayer.setPlayWhenReady(true);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        mExoPlayer.setPlayWhenReady(false);
         if(mIsStartLogin){
             finish();
         }
@@ -142,6 +256,11 @@ public class TitleActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
         Util.releaseImageView((ImageView) findViewById(R.id.login_button));
         Util.releaseWebView(mLoginWebview);
     }

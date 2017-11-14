@@ -8,10 +8,13 @@
 #include "cocos2d.h"
 #include "platform/android/jni/JniHelper.h"
 #include <jni.h>
+#include "PlayingScene.h"
 
 class NativeAndroidHelper {
 public:
-    static void beat();
+    static void smile(float score);
+    static void detect();
+    static void gone();
     static void startCamera();
     static void releaseCamera();
 };

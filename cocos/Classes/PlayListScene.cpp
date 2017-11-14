@@ -24,6 +24,13 @@ bool PlayListScene::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+    auto bgImage = ui::ImageView::create("images/ui/bg_03.png");
+    float baseScale = std::max(visibleSize.width / bgImage->getContentSize().width, visibleSize.height / bgImage->getContentSize().height);
+    bgImage->setScale(baseScale);
+    Size bgImageBounseBoxSize = bgImage->getBoundingBox().size;
+    bgImage->setPosition(Vec2(origin.x + bgImageBounseBoxSize.width / 2, origin.y + bgImageBounseBoxSize.height / 2));
+    this->addChild(bgImage);
+
     auto playlistView = ui::ListView::create();
     // これがないとうまく表示されない
     playlistView->setClippingEnabled(false);

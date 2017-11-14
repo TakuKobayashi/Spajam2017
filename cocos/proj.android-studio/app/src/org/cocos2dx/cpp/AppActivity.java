@@ -27,7 +27,9 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
@@ -122,11 +124,25 @@ public class AppActivity extends Cocos2dxActivity {
                     @Override
                     public void onNewItem(int faceId, Face item) {
                         Log.d(Config.TAG, "newItem");
+                        callDetect();
                     }
 
                     @Override
                     public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
                         Log.d(Config.TAG, "update");
+                        SparseArray<Face> faces = detectionResults.getDetectedItems();
+                        float maxSmilingScore = Float.MIN_VALUE;
+                        for(int i = 0;i < faces.size();++i){
+                            Face detectFace = faces.get(i);
+                            Log.d(Config.TAG, "" + detectFace);
+                            if(detectFace == null) continue;
+                            Log.d(Config.TAG, "smileScore:" + detectFace.getIsSmilingProbability());
+                            if(maxSmilingScore < detectFace.getIsSmilingProbability()){
+                                maxSmilingScore = detectFace.getIsSmilingProbability();
+                            }
+                        }
+                        Log.d(Config.TAG, "maxSmile:" + maxSmilingScore);
+                        callSmile(Math.max(maxSmilingScore, 0));
                     }
 
                     @Override
@@ -137,6 +153,7 @@ public class AppActivity extends Cocos2dxActivity {
                     @Override
                     public void onDone() {
                         Log.d(Config.TAG, "done");
+                        callGone();
                     }
                 };
             }
@@ -159,6 +176,10 @@ public class AppActivity extends Cocos2dxActivity {
         gCamera.start();
 */
     }
+
+    private native static void callSmile(float score);
+    private native static void callDetect();
+    private native static void callGone();
 
     private static void cameraStart(){
         try {

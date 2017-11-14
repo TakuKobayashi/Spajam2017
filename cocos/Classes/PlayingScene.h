@@ -18,11 +18,19 @@ private:
     float mBaseScale = 1.0f;
     void fireBeatBall();
 
+    static float const SMILE_THREATHOLD;
+    static float gPrevSmileValue;
+    static cocos2d::Sprite* detectIcon;
+    static cocos2d::Sprite* targetIcon;
+    static void beat();
+
 public:
     static cocos2d::Scene* createScene(int index);
     virtual bool init();
     void update(float dt) override;
-    static void beat();
+    static void smile(float score);
+    static void detect();
+    static void gone();
     void release();
     CREATE_FUNC(PlayingScene);
 };

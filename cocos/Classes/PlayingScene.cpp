@@ -7,6 +7,11 @@ Scene* PlayingScene::createScene(int index)
     return PlayingScene::create();
 }
 
+const float PlayingScene::SMILE_THREATHOLD = 0.12f;
+float PlayingScene::gPrevSmileValue = -1.0f;
+Sprite* PlayingScene::detectIcon = NULL;
+Sprite* PlayingScene::targetIcon = NULL;
+
 bool PlayingScene::init()
 {
     if ( !Scene::init() )
@@ -31,18 +36,23 @@ bool PlayingScene::init()
     auto bgImage = ui::ImageView::create("images/ui/bg.png");
     mBaseScale = std::max(visibleSize.width / bgImage->getContentSize().width, visibleSize.height / bgImage->getContentSize().height);
     bgImage->setScale(mBaseScale);
-
     Size bgImageBounseBoxSize = bgImage->getBoundingBox().size;
     bgImage->setPosition(Vec2(origin.x + bgImageBounseBoxSize.width / 2, origin.y + bgImageBounseBoxSize.height / 2));
     this->addChild(bgImage);
 
     float laneHeight = 11 * mBaseScale;
 
-    auto targetImage = ui::ImageView::create("images/ui/target.png");
-    targetImage->setScale(mBaseScale);
-    Size targetImageBoxSize = targetImage->getBoundingBox().size;
-    targetImage->setPosition(Vec2(origin.x + targetImageBoxSize.width / 2, laneHeight + origin.y + targetImageBoxSize.height / 2));
-    this->addChild(targetImage);
+    targetIcon = Sprite::create("images/mato_B.png");
+    targetIcon->setScale(mBaseScale);
+    Size targetImageBoxSize = targetIcon->getBoundingBox().size;
+    targetIcon->setPosition(Vec2(origin.x + targetImageBoxSize.width / 2, laneHeight + origin.y + targetImageBoxSize.height / 2));
+    this->addChild(targetIcon);
+
+    detectIcon = Sprite::create("images/icon_NO_ver2.png");
+    detectIcon->setScale(mBaseScale);
+    Size detectIconImageBoxSize = detectIcon->getBoundingBox().size;
+    detectIcon->setPosition(Vec2(origin.x + detectIconImageBoxSize.width / 2, origin.y + visibleSize.height - detectIconImageBoxSize.height / 2));
+    this->addChild(detectIcon);
 
     auto scoreBarBase = ui::ImageView::create("images/ui/frame.png");
     scoreBarBase->setScale(mBaseScale);
@@ -78,7 +88,7 @@ bool PlayingScene::init()
 void PlayingScene::fireBeatBall(){
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    auto beatBall = Sprite::create("images/tamaA.png");
+    auto beatBall = Sprite::create("images/tamaC.png");
     beatBall->setScale(mBaseScale);
     float laneHeight = 11 * mBaseScale;
     Size beatBallBoxSize = beatBall->getBoundingBox().size;
@@ -90,9 +100,32 @@ void PlayingScene::fireBeatBall(){
     }, NULL) );
 }
 
+void PlayingScene::smile(float score){
+    log("%f%f", score, PlayingScene::gPrevSmileValue);
+    if(PlayingScene::gPrevSmileValue < PlayingScene::SMILE_THREATHOLD && PlayingScene::SMILE_THREATHOLD < score){
+        log("smile!!");
+        beat();
+    }
+    PlayingScene::gPrevSmileValue = score;
+}
+
 void PlayingScene::beat(){
     int id = experimental::AudioEngine::play2d("sounds/taiko.mp3", false, 1.0f);
+    PlayingScene::targetIcon->setSpriteFrame(Sprite::create("images/mato_A.png")->getSpriteFrame());
+    experimental::AudioEngine::setFinishCallback(id, [](int audioId, std::string filePath){
+        PlayingScene::targetIcon->setSpriteFrame(Sprite::create("images/mato_B.png")->getSpriteFrame());
+    });
     log("%d", id);
+}
+
+void PlayingScene::detect(){
+    PlayingScene::detectIcon->setSpriteFrame(Sprite::create("images/icon_OK_ver2.png")->getSpriteFrame());
+    log("detect");
+}
+
+void PlayingScene::gone(){
+    PlayingScene::detectIcon->setSpriteFrame(Sprite::create("images/icon_NO_ver2.png")->getSpriteFrame());
+    log("gone");
 }
 
 void PlayingScene::release(){
@@ -100,6 +133,9 @@ void PlayingScene::release(){
     NativeAndroidHelper::releaseCamera();
 #endif
     Director::getInstance()->replaceScene(PlayListScene::createScene());
+    experimental::AudioEngine::resumeAll();
+    PlayingScene::detectIcon->release();
+    PlayingScene::targetIcon->release();
 }
 
 void PlayingScene::update(float dt){
