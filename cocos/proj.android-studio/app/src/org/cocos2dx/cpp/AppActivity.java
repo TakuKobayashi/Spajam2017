@@ -129,7 +129,7 @@ public class AppActivity extends Cocos2dxActivity {
 
                     @Override
                     public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
-                        Log.d(Config.TAG, "update");
+                        Log.d(Config.TAG, "update:" + face);
                         SparseArray<Face> faces = detectionResults.getDetectedItems();
                         float maxSmilingScore = Float.MIN_VALUE;
                         for(int i = 0;i < faces.size();++i){
@@ -141,6 +141,7 @@ public class AppActivity extends Cocos2dxActivity {
                                 maxSmilingScore = detectFace.getIsSmilingProbability();
                             }
                         }
+                        if(maxSmilingScore < 0) return;
                         Log.d(Config.TAG, "maxSmile:" + maxSmilingScore);
                         callSmile(Math.max(maxSmilingScore, 0));
                     }
