@@ -148,20 +148,6 @@ public class AppActivity extends Cocos2dxActivity {
         });
     }
 
-    public static void playSound(String spotifyUrl){
-        gSpotifyPlayer.playUri(new Player.OperationCallback() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onError(Error error) {
-
-            }
-        }, spotifyUrl,0,0);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if (requestCode != REQUEST_CODE_CAMERA_PERMISSION)
@@ -185,7 +171,7 @@ public class AppActivity extends Cocos2dxActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        //        gSpotifyPlayer.pause();
+        gSpotifyPlayer.pause(gOperationCallback);
         stopCamera();
     }
 
@@ -205,6 +191,22 @@ public class AppActivity extends Cocos2dxActivity {
     private static int gTaikoNetworkId = -1;
     private static ArrayList<Integer> gConfigureNetworkIds = new ArrayList<Integer>();
     private static SpotifyPlayer gSpotifyPlayer;
+
+    public static void playSound(String spotifyUrl){
+        gSpotifyPlayer.playUri(gOperationCallback, spotifyUrl,0,0);
+    }
+
+    private static Player.OperationCallback gOperationCallback = new Player.OperationCallback() {
+        @Override
+        public void onSuccess() {
+
+        }
+
+        @Override
+        public void onError(Error error) {
+
+        }
+    };
 
     public static void startCamera(){
         Log.d(Config.TAG, "startCamera");

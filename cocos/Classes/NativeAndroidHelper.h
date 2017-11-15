@@ -12,6 +12,8 @@
 
 class NativeAndroidHelper {
 public:
+    static std::string getUserToken();
+    static void startSound(std::string spotifyId);
     static void smile(float score);
     static void detect();
     static void gone();

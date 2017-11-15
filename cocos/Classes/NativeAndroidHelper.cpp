@@ -14,6 +14,16 @@ void NativeAndroidHelper::startCamera()
     methodInfo.env->DeleteLocalRef(methodInfo.classID);
 }
 
+void NativeAndroidHelper::startSound(std::string spotifyid)
+{
+    JniMethodInfo methodInfo;
+    if (!JniHelper::getStaticMethodInfo(methodInfo, CLASS_NAME, "playSound", "(Ljava/lang/String;)V")) {
+        return;
+    }
+    methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, spotifyid);
+    methodInfo.env->DeleteLocalRef(methodInfo.classID);
+}
+
 void NativeAndroidHelper::releaseCamera()
 {
     JniMethodInfo methodInfo;
@@ -22,6 +32,18 @@ void NativeAndroidHelper::releaseCamera()
     }
     methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID);
     methodInfo.env->DeleteLocalRef(methodInfo.classID);
+}
+
+std::string NativeAndroidHelper::getUserToken()
+{
+    std::string ret;
+    JniMethodInfo methodInfo;
+    if (!JniHelper::getStaticMethodInfo(methodInfo, CLASS_NAME, "getUserToken", "()Ljava/lang/String;")) {
+        jobject objResult = methodInfo.env->CallStaticObjectMethod(methodInfo.classID, methodInfo.methodID);
+        ret = cocos2d::JniHelper::jstring2string((jstring) objResult); // jstringをstd::stringに変換
+        methodInfo.env->DeleteLocalRef(methodInfo.classID);
+    }
+    return ret;
 }
 
 void NativeAndroidHelper::smile(float score)
