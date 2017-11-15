@@ -48,11 +48,23 @@ bool PlayingScene::init()
     targetIcon->setPosition(Vec2(origin.x + targetImageBoxSize.width / 2, laneHeight + origin.y + targetImageBoxSize.height / 2));
     this->addChild(targetIcon);
 
+    SpriteFrameCache::getInstance()->addSpriteFrame(targetIcon->getSpriteFrame(), "matoB");
+    auto spriteB = Sprite::create("images/mato_A.png");
+    spriteB->setScale(mBaseScale);
+    spriteB->setPosition(Vec2(origin.x + targetImageBoxSize.width / 2, laneHeight + origin.y + targetImageBoxSize.height / 2));
+    SpriteFrameCache::getInstance()->addSpriteFrame(spriteB->getSpriteFrame(), "matoA");
+
     detectIcon = Sprite::create("images/icon_NO_ver2.png");
     detectIcon->setScale(mBaseScale);
     Size detectIconImageBoxSize = detectIcon->getBoundingBox().size;
     detectIcon->setPosition(Vec2(origin.x + detectIconImageBoxSize.width / 2, origin.y + visibleSize.height - detectIconImageBoxSize.height / 2));
     this->addChild(detectIcon);
+
+    SpriteFrameCache::getInstance()->addSpriteFrame(detectIcon->getSpriteFrame(), "iconNO");
+    auto spriteYes = Sprite::create("images/icon_OK_ver2.png");
+    spriteYes->setScale(mBaseScale);
+    spriteYes->setPosition(Vec2(origin.x + detectIconImageBoxSize.width / 2, origin.y + visibleSize.height - detectIconImageBoxSize.height / 2));
+    SpriteFrameCache::getInstance()->addSpriteFrame(spriteYes->getSpriteFrame(), "iconOK");
 
     auto scoreBarBase = ui::ImageView::create("images/ui/frame.png");
     scoreBarBase->setScale(mBaseScale);
@@ -111,20 +123,20 @@ void PlayingScene::smile(float score){
 
 void PlayingScene::beat(){
     int id = experimental::AudioEngine::play2d("sounds/taiko.mp3", false, 1.0f);
-    PlayingScene::targetIcon->setSpriteFrame(Sprite::create("images/mato_A.png")->getSpriteFrame());
+    PlayingScene::targetIcon->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName("matoA"));
     experimental::AudioEngine::setFinishCallback(id, [](int audioId, std::string filePath){
-        PlayingScene::targetIcon->setSpriteFrame(Sprite::create("images/mato_B.png")->getSpriteFrame());
+        PlayingScene::targetIcon->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName("matoB"));
     });
     log("%d", id);
 }
 
 void PlayingScene::detect(){
-    PlayingScene::detectIcon->setSpriteFrame(Sprite::create("images/icon_OK_ver2.png")->getSpriteFrame());
+    PlayingScene::detectIcon->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName("iconOK"));
     log("detect");
 }
 
 void PlayingScene::gone(){
-    PlayingScene::detectIcon->setSpriteFrame(Sprite::create("images/icon_NO_ver2.png")->getSpriteFrame());
+    PlayingScene::detectIcon->setSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName("iconNO"));
     log("gone");
 }
 
