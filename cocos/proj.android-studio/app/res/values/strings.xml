@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">egaonotatsuzin</string>
     <string name="prefernceName">egaonotatsuzinDB</string>
+    <string name="apotify_clientid">f09e3953d5374a1484de0c9ba0cfff9b</string>
 </resources>

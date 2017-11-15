@@ -47,9 +47,15 @@ import com.spotify.sdk.android.player.SpotifyPlayer;
 import net.taptappun.taku.kobayashi.R;
 
 import org.cocos2dx.lib.Cocos2dxActivity;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class AppActivity extends Cocos2dxActivity {
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 1;
@@ -71,6 +77,7 @@ public class AppActivity extends Cocos2dxActivity {
         gApplicationContext = this.getApplicationContext();
         setupFaceDetectCamera();
         setupHardwareWifi();
+        setupSpotifyPlayer();
     }
 
     private void setupHardwareWifi(){
@@ -97,53 +104,72 @@ public class AppActivity extends Cocos2dxActivity {
     }
 
     private void setupSpotifyPlayer(){
-        com.spotify.sdk.android.player.Config playerConfig = new com.spotify.sdk.android.player.Config(this, "accessToken", "CLIENT_ID");
-        Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+        new Thread(new Runnable() {
             @Override
-            public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                gSpotifyPlayer = spotifyPlayer;
-                gSpotifyPlayer.addConnectionStateCallback(new ConnectionStateCallback() {
-                    @Override
-                    public void onLoggedIn() {
+            public void run() {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("https://taptappun.net/egaonotatsuzin/api/playlists/config?token=" + getUserToken())
+                        .build();
 
-                    }
+                try {
+                    Response response = client.newCall(request).execute();
+                    JSONObject job = new JSONObject(response.body().string());
+                    com.spotify.sdk.android.player.Config playerConfig = new com.spotify.sdk.android.player.Config(AppActivity.this, job.getString("access_token"), job.getString("client_id"));
+                    Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+                        @Override
+                        public void onInitialized(SpotifyPlayer spotifyPlayer) {
+                            gSpotifyPlayer = spotifyPlayer;
+                            gSpotifyPlayer.addConnectionStateCallback(new ConnectionStateCallback() {
+                                @Override
+                                public void onLoggedIn() {
 
-                    @Override
-                    public void onLoggedOut() {
+                                }
 
-                    }
+                                @Override
+                                public void onLoggedOut() {
 
-                    @Override
-                    public void onLoginFailed(Error error) {
+                                }
 
-                    }
+                                @Override
+                                public void onLoginFailed(Error error) {
 
-                    @Override
-                    public void onTemporaryError() {
+                                }
 
-                    }
+                                @Override
+                                public void onTemporaryError() {
 
-                    @Override
-                    public void onConnectionMessage(String s) {
+                                }
 
-                    }
-                });
-                gSpotifyPlayer.addNotificationCallback(new Player.NotificationCallback() {
-                    @Override
-                    public void onPlaybackEvent(PlayerEvent playerEvent) {
+                                @Override
+                                public void onConnectionMessage(String s) {
 
-                    }
+                                }
+                            });
+                            gSpotifyPlayer.addNotificationCallback(new Player.NotificationCallback() {
+                                @Override
+                                public void onPlaybackEvent(PlayerEvent playerEvent) {
 
-                    @Override
-                    public void onPlaybackError(Error error) {
+                                }
 
-                    }
-                });
-            }
+                                @Override
+                                public void onPlaybackError(Error error) {
 
-            @Override
-            public void onError(Throwable throwable) {
-                Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+                            Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+                        }
+                    });
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -286,6 +312,7 @@ public class AppActivity extends Cocos2dxActivity {
 
     public static String getUserToken(){
         SharedPreferences sp = gApplicationContext.getSharedPreferences(gApplicationContext.getResources().getString(R.string.prefernceName), Context.MODE_PRIVATE);
+        Log.d(Config.TAG, sp.getString("user_token", ""));
         return sp.getString("user_token", "");
     }
 

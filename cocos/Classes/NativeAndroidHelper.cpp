@@ -20,7 +20,8 @@ void NativeAndroidHelper::startSound(std::string spotifyid)
     if (!JniHelper::getStaticMethodInfo(methodInfo, CLASS_NAME, "playSound", "(Ljava/lang/String;)V")) {
         return;
     }
-    methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, spotifyid);
+    jstring spotifyidjstr = methodInfo.env->NewStringUTF(spotifyid.c_str());
+    methodInfo.env->CallStaticVoidMethod(methodInfo.classID, methodInfo.methodID, spotifyidjstr);
     methodInfo.env->DeleteLocalRef(methodInfo.classID);
 }
 
@@ -39,10 +40,12 @@ std::string NativeAndroidHelper::getUserToken()
     std::string ret;
     JniMethodInfo methodInfo;
     if (!JniHelper::getStaticMethodInfo(methodInfo, CLASS_NAME, "getUserToken", "()Ljava/lang/String;")) {
+        log("call");
         jobject objResult = methodInfo.env->CallStaticObjectMethod(methodInfo.classID, methodInfo.methodID);
         ret = cocos2d::JniHelper::jstring2string((jstring) objResult); // jstringをstd::stringに変換
         methodInfo.env->DeleteLocalRef(methodInfo.classID);
     }
+    log("result:%s", ret.c_str());
     return ret;
 }
 

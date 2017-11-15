@@ -6,6 +6,8 @@
 #include "PlayListScene.h"
 #include "PlayingScene.h"
 
+using namespace cocos2d::network;
+
 USING_NS_CC;
 
 Scene* PlayListScene::createScene()
@@ -61,6 +63,26 @@ bool PlayListScene::init()
         }
     };
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(systemButtonListener, this);
+
+    std::string url = "https://taptappun.net/egaonotatsuzin/api/playlists";
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    url += "?token=" + NativeAndroidHelper::getUserToken();
+#endif
+
+    HttpRequest* request = new HttpRequest();
+    request->setUrl(url);
+    request->setRequestType(HttpRequest::Type::GET);
+    request->setResponseCallback([this](HttpClient* client, HttpResponse* response) {
+        if (!response) {
+            return;
+        }
+
+        std::string responseString(response->getResponseData()->begin(), response->getResponseData()->end());
+        log("response = %s", responseString.c_str());
+    });
+    HttpClient::getInstance()->send(request);
+    request->release();
+
     return true;
 }
 

@@ -112,4 +112,5 @@ dependencies {
     compile 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.5.+'
     compile 'com.google.android.exoplayer:exoplayer-ui:r2.5.+'
     compile 'com.spotify.sdk:spotify-player-24-noconnect-2.20b@aar'
+    compile 'com.squareup.okhttp3:okhttp:3.9.0'
 }

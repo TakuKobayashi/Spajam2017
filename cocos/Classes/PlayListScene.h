@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "ui/CocosGUI.h"
 #include "PlayingScene.h"
+#include "network/HttpClient.h"
 
 class PlayListScene : public cocos2d::Scene{
 private:
