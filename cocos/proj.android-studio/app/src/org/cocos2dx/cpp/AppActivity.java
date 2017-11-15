@@ -24,6 +24,7 @@ THE SOFTWARE.
 package org.cocos2dx.cpp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -204,6 +205,11 @@ public class AppActivity extends Cocos2dxActivity {
         gCamera.setDetectorThread(detectorThread);
         gCamera.start();
 */
+    }
+
+    public static String getUserToken(){
+        SharedPreferences sp = gApplicationContext.getSharedPreferences(gApplicationContext.getResources().getString(R.string.prefernceName), Context.MODE_PRIVATE);
+        return sp.getString("user_token", "");
     }
 
     private native static void callSmile(float score);
