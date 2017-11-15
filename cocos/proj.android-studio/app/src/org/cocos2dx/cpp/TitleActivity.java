@@ -1,7 +1,9 @@
 package org.cocos2dx.cpp;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -65,9 +67,7 @@ public class TitleActivity extends Activity {
         if (Intent.ACTION_VIEW.equals(action)){
             // 呼び出されたディープリンクのURLを取得する
             Uri uri = receiveIntent.getData();
-            String user_token = uri.getQueryParameter("user_token");
-            Cocos2dxLocalStorage.setItem("user_token", user_token);
-            startPlayList();
+            registerAccount(uri);
         }
 
         Util.requestPermissions(this, REQUEST_CODE_CAMERA_PERMISSION);
@@ -88,13 +88,23 @@ public class TitleActivity extends Activity {
                     ImageView pressImage = (ImageView) v;
                     Util.releaseImageView(pressImage);
                     pressImage.setImageBitmap(Util.loadImageFromAsset(TitleActivity.this, "images/ui/spotify_login_button.png"));
-                    startPlayList();
-                    //showLoginWebView();
+                    //startPlayList();
+                    showLoginWebView();
                 }
                 return true;
             }
         });
         initExoPlayer();
+    }
+
+    private void registerAccount(Uri uri){
+        Log.d(Config.TAG, uri.toString());
+        String user_token = uri.getQueryParameter("user_token");
+        SharedPreferences data = getSharedPreferences(getString(R.string.prefernceName), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = data.edit();
+        editor.putString("user_token", user_token);
+        editor.apply();
+        startPlayList();
     }
 
     private void initExoPlayer(){
@@ -190,6 +200,10 @@ public class TitleActivity extends Activity {
         mLoginWebview.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if(url.contains("https://taptappun.net/egaonotatsuzin/authentication/callback")){
+                    registerAccount(Uri.parse(url));
+                    return false;
+                }
                 return super.shouldOverrideUrlLoading(view, url);
             }
 
@@ -205,7 +219,8 @@ public class TitleActivity extends Activity {
                 setProgressBarIndeterminateVisibility(false);
             }
         });
-        mLoginWebview.loadUrl("https://taptappun.net/egaonotatsuzin/authentication/sign_in");
+        SharedPreferences data = getSharedPreferences(getString(R.string.prefernceName), Context.MODE_PRIVATE);
+        mLoginWebview.loadUrl("https://taptappun.net/egaonotatsuzin/authentication/sign_in?token=" + data.getString("user_token", ""));
     }
 
     private void startPlayList(){

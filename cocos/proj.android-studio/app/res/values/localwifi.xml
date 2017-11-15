@@ -1,0 +1,5 @@
+<resources>
+  <string name="ipaddress">192.168.4.1</string>
+  <string name="networkName">LongFriend</string>
+  <string name="networkPassword">nagatomo</string>
+</resources>

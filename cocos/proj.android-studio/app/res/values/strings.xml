@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">egaonotatsuzin</string>
+    <string name="prefernceName">egaonotatsuzinDB</string>
 </resources>
