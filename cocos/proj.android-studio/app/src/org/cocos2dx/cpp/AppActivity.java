@@ -24,6 +24,9 @@ THE SOFTWARE.
 package org.cocos2dx.cpp;
 
 import android.content.Context;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
@@ -34,9 +37,12 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import net.taptappun.taku.kobayashi.R;
+
 import org.cocos2dx.lib.Cocos2dxActivity;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class AppActivity extends Cocos2dxActivity {
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 1;
@@ -57,6 +63,30 @@ public class AppActivity extends Cocos2dxActivity {
         Util.requestPermissions(this, REQUEST_CODE_CAMERA_PERMISSION);
         gApplicationContext = this.getApplicationContext();
         setupFaceDetectCamera();
+        setupHardwareWifi();
+    }
+
+    private void setupHardwareWifi(){
+        gWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        String ssid = getString(R.string.networkName);
+        WifiConfiguration config = new WifiConfiguration();
+        config.SSID = ssid;
+        config.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+        config.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+        config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+        config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+        config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+        config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+        config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+        config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+        config.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+        config.preSharedKey = getString(R.string.networkPassword);
+        gTaikoNetworkId = gWifiManager.addNetwork(config); // 失敗した場合は-1となります
+        gWifiManager.saveConfiguration();
+        gWifiManager.updateNetwork(config);
+        for (WifiConfiguration c0 : gWifiManager.getConfiguredNetworks()) {
+            gConfigureNetworkIds.add(c0.networkId);
+        }
     }
 
     @Override
@@ -96,6 +126,9 @@ public class AppActivity extends Cocos2dxActivity {
     private static boolean gIsCameraActivate = false;
     private static Context gApplicationContext;
     private static CameraSource gCamera = null;
+    private static WifiManager gWifiManager = null;
+    private static int gTaikoNetworkId = -1;
+    private static ArrayList<Integer> gConfigureNetworkIds = new ArrayList<Integer>();
 
     public static void startCamera(){
         Log.d(Config.TAG, "startCamera");
