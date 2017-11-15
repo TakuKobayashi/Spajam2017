@@ -24,15 +24,9 @@ THE SOFTWARE.
 package org.cocos2dx.cpp;
 
 import android.content.Context;
-import android.hardware.Camera;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.ViewGroup;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.MultiProcessor;
@@ -62,15 +56,18 @@ public class AppActivity extends Cocos2dxActivity {
         // DO OTHER INITIALIZATION BELOW
         Util.requestPermissions(this, REQUEST_CODE_CAMERA_PERMISSION);
         gApplicationContext = this.getApplicationContext();
-        startFaceDetectCamera();
+        setupFaceDetectCamera();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if (requestCode != REQUEST_CODE_CAMERA_PERMISSION)
             return;
-        if(!Util.existConfirmPermissions(this) && gIsCameraActivate){
-            startFaceDetectCamera();
+        if(!Util.existConfirmPermissions(this)){
+            setupFaceDetectCamera();
+            if(gIsCameraActivate){
+                startFaceDetectCamera();
+            }
         }
     }
 
@@ -85,16 +82,13 @@ public class AppActivity extends Cocos2dxActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        releaseFaceDetectCamera();
+        stopCamera();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(gCamera != null){
-            gCamera.release();
-            gCamera = null;
-        }
+        releaseCamera();
     }
 
     //---------------------------------------------------------------------------------------------------------------------------------
@@ -106,10 +100,10 @@ public class AppActivity extends Cocos2dxActivity {
     public static void startCamera(){
         Log.d(Config.TAG, "startCamera");
         gIsCameraActivate = true;
-        cameraStart();
+        startFaceDetectCamera();
     }
 
-    private static void startFaceDetectCamera(){
+    private static void setupFaceDetectCamera(){
         /*
         if(gCamera == null){
             gCamera = new CameraWrapper();
@@ -183,7 +177,7 @@ public class AppActivity extends Cocos2dxActivity {
     private native static void callDetect();
     private native static void callGone();
 
-    private static void cameraStart(){
+    private static void startFaceDetectCamera(){
         try {
             gCamera.start();
         } catch (IOException e) {
@@ -198,9 +192,16 @@ public class AppActivity extends Cocos2dxActivity {
         releaseFaceDetectCamera();
     }
 
+    private static void stopCamera(){
+        if(gCamera != null) {
+            gCamera.stop();
+        }
+    }
+
     private static void releaseFaceDetectCamera(){
         if(gCamera != null) {
             gCamera.stop();
+            gCamera.release();
         }
     }
 
