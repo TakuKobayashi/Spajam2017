@@ -9,6 +9,7 @@ Scene* PlayingScene::createScene(int index)
 
 const float PlayingScene::SMILE_THREATHOLD = 0.12f;
 float PlayingScene::gPrevSmileValue = -1.0f;
+long PlayingScene::gTime = 0;
 Sprite* PlayingScene::detectIcon = NULL;
 Sprite* PlayingScene::targetIcon = NULL;
 
@@ -151,6 +152,11 @@ void PlayingScene::release(){
 }
 
 void PlayingScene::update(float dt){
+    log("update");
     mTime += dt;
-    log(mTime);
+}
+
+void PlayingScene::frame(long millisecond){
+    gTime += millisecond;
+    log("update:%l", millisecond);
 }

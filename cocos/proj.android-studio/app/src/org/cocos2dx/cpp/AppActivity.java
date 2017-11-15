@@ -29,6 +29,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -59,6 +60,8 @@ import okhttp3.Response;
 
 public class AppActivity extends Cocos2dxActivity {
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 1;
+    private Handler mHandler;
+    private long mPrevTime = System.currentTimeMillis();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,18 @@ public class AppActivity extends Cocos2dxActivity {
         setupFaceDetectCamera();
         setupHardwareWifi();
         setupSpotifyPlayer();
+
+        mPrevTime = System.currentTimeMillis();
+        mHandler = new Handler();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                callFrame(System.currentTimeMillis() - mPrevTime);
+                mPrevTime = System.currentTimeMillis();
+                mHandler.postDelayed(this, 20);
+
+            }
+        }, 20);
     }
 
     private void setupHardwareWifi(){
@@ -206,6 +221,7 @@ public class AppActivity extends Cocos2dxActivity {
         super.onDestroy();
         releaseCamera();
         Spotify.destroyPlayer(this);
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     //---------------------------------------------------------------------------------------------------------------------------------
@@ -319,6 +335,7 @@ public class AppActivity extends Cocos2dxActivity {
     private native static void callSmile(float score);
     private native static void callDetect();
     private native static void callGone();
+    private native static void callFrame(long dtMillisecond);
 
     private static void startFaceDetectCamera(){
         try {
