@@ -37,6 +37,12 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.spotify.sdk.android.player.ConnectionStateCallback;
+import com.spotify.sdk.android.player.Error;
+import com.spotify.sdk.android.player.Player;
+import com.spotify.sdk.android.player.PlayerEvent;
+import com.spotify.sdk.android.player.Spotify;
+import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import net.taptappun.taku.kobayashi.R;
 
@@ -90,6 +96,72 @@ public class AppActivity extends Cocos2dxActivity {
         }
     }
 
+    private void setupSpotifyPlayer(){
+        com.spotify.sdk.android.player.Config playerConfig = new com.spotify.sdk.android.player.Config(this, "accessToken", "CLIENT_ID");
+        Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
+            @Override
+            public void onInitialized(SpotifyPlayer spotifyPlayer) {
+                gSpotifyPlayer = spotifyPlayer;
+                gSpotifyPlayer.addConnectionStateCallback(new ConnectionStateCallback() {
+                    @Override
+                    public void onLoggedIn() {
+
+                    }
+
+                    @Override
+                    public void onLoggedOut() {
+
+                    }
+
+                    @Override
+                    public void onLoginFailed(Error error) {
+
+                    }
+
+                    @Override
+                    public void onTemporaryError() {
+
+                    }
+
+                    @Override
+                    public void onConnectionMessage(String s) {
+
+                    }
+                });
+                gSpotifyPlayer.addNotificationCallback(new Player.NotificationCallback() {
+                    @Override
+                    public void onPlaybackEvent(PlayerEvent playerEvent) {
+
+                    }
+
+                    @Override
+                    public void onPlaybackError(Error error) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Log.e("MainActivity", "Could not initialize player: " + throwable.getMessage());
+            }
+        });
+    }
+
+    public static void playSound(String spotifyUrl){
+        gSpotifyPlayer.playUri(new Player.OperationCallback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(Error error) {
+
+            }
+        }, spotifyUrl,0,0);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if (requestCode != REQUEST_CODE_CAMERA_PERMISSION)
@@ -113,6 +185,7 @@ public class AppActivity extends Cocos2dxActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        //        gSpotifyPlayer.pause();
         stopCamera();
     }
 
@@ -120,6 +193,7 @@ public class AppActivity extends Cocos2dxActivity {
     protected void onDestroy() {
         super.onDestroy();
         releaseCamera();
+        Spotify.destroyPlayer(this);
     }
 
     //---------------------------------------------------------------------------------------------------------------------------------
@@ -130,6 +204,7 @@ public class AppActivity extends Cocos2dxActivity {
     private static WifiManager gWifiManager = null;
     private static int gTaikoNetworkId = -1;
     private static ArrayList<Integer> gConfigureNetworkIds = new ArrayList<Integer>();
+    private static SpotifyPlayer gSpotifyPlayer;
 
     public static void startCamera(){
         Log.d(Config.TAG, "startCamera");
