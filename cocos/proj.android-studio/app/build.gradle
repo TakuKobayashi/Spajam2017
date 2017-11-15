@@ -111,4 +111,5 @@ dependencies {
     compile 'com.google.android.exoplayer:exoplayer-hls:r2.5.+'
     compile 'com.google.android.exoplayer:exoplayer-smoothstreaming:r2.5.+'
     compile 'com.google.android.exoplayer:exoplayer-ui:r2.5.+'
+    compile 'com.spotify.sdk:spotify-player-24-noconnect-2.20b@aar'
 }
