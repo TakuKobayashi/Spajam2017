@@ -64,11 +64,7 @@ bool PlayListScene::init()
     };
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(systemButtonListener, this);
 
-    std::string url = "https://taptappun.net/egaonotatsuzin/api/playlists";
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    url += "?token=" + NativeAndroidHelper::getUserToken();
-#endif
-
+    std::string url = "https://taptappun.net/egaonotatsuzin/api/playlists?token=" + UserDefault::getInstance()->getStringForKey("user_token", "");
     HttpRequest* request = new HttpRequest();
     request->setUrl(url);
     request->setRequestType(HttpRequest::Type::GET);

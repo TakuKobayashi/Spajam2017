@@ -20,7 +20,4 @@ JNIEXPORT void JNICALL Java_org_cocos2dx_cpp_AppActivity_callDetect(JNIEnv *env,
 JNIEXPORT void JNICALL Java_org_cocos2dx_cpp_AppActivity_callGone(JNIEnv *env, jobject obj){
     NativeAndroidHelper::gone();
 }
-JNIEXPORT void JNICALL Java_org_cocos2dx_cpp_AppActivity_callFrame(JNIEnv *env, jobject obj, jlong millisecond){
-    NativeAndroidHelper::frame(millisecond);
-}
 }

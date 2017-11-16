@@ -17,7 +17,6 @@ public:
     static void smile(float score);
     static void detect();
     static void gone();
-    static void frame(long millisecond);
     static void startCamera();
     static void releaseCamera();
 };

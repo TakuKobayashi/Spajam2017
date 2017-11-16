@@ -9,7 +9,6 @@ Scene* PlayingScene::createScene(int index)
 
 const float PlayingScene::SMILE_THREATHOLD = 0.12f;
 float PlayingScene::gPrevSmileValue = -1.0f;
-long PlayingScene::gTime = 0;
 Sprite* PlayingScene::detectIcon = NULL;
 Sprite* PlayingScene::targetIcon = NULL;
 
@@ -87,7 +86,7 @@ bool PlayingScene::init()
     {
         if (keyCode == EventKeyboard::KeyCode::KEY_BACK)
         {
-            this->release();
+            this->sceneRelease();
         }
     };
     this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(systemButtonListener, this);
@@ -141,7 +140,7 @@ void PlayingScene::gone(){
     log("gone");
 }
 
-void PlayingScene::release(){
+void PlayingScene::sceneRelease(){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
     NativeAndroidHelper::releaseCamera();
 #endif
@@ -154,9 +153,4 @@ void PlayingScene::release(){
 void PlayingScene::update(float dt){
     log("update");
     mTime += dt;
-}
-
-void PlayingScene::frame(long millisecond){
-    gTime += millisecond;
-    log("update:%l", millisecond);
 }

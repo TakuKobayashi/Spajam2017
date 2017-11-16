@@ -41,9 +41,6 @@ import com.google.android.exoplayer2.upstream.DataSource;
 
 import net.taptappun.taku.kobayashi.R;
 
-import org.cocos2dx.lib.Cocos2dxActivity;
-import org.cocos2dx.lib.Cocos2dxLocalStorage;
-
 import java.io.IOException;
 
 public class TitleActivity extends Activity {
@@ -100,10 +97,8 @@ public class TitleActivity extends Activity {
     private void registerAccount(Uri uri){
         Log.d(Config.TAG, uri.toString());
         String user_token = uri.getQueryParameter("user_token");
-        SharedPreferences data = getSharedPreferences(getString(R.string.prefernceName), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = data.edit();
-        editor.putString("user_token", user_token);
-        editor.apply();
+        //Cocos2dxのC++側のUserDefaultと共有できるやり方
+        Cocos2dxSharedPreferences.saveValue(this, "user_token", user_token);
         startPlayList();
     }
 
@@ -200,7 +195,7 @@ public class TitleActivity extends Activity {
         mLoginWebview.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if(url.contains("https://taptappun.net/egaonotatsuzin/authentication/callback")){
+                if(url.contains(Config.ROOT_URL + "/authentication/callback")){
                     registerAccount(Uri.parse(url));
                     return false;
                 }
@@ -219,8 +214,8 @@ public class TitleActivity extends Activity {
                 setProgressBarIndeterminateVisibility(false);
             }
         });
-        SharedPreferences data = getSharedPreferences(getString(R.string.prefernceName), Context.MODE_PRIVATE);
-        mLoginWebview.loadUrl("https://taptappun.net/egaonotatsuzin/authentication/sign_in?token=" + data.getString("user_token", ""));
+        //Cocos2dxのC++側のUserDefaultと共有できるやり方
+        mLoginWebview.loadUrl(Config.ROOT_URL + "/authentication/sign_in?token=" + Cocos2dxSharedPreferences.getSharedPreferences(this).getString("user_token", ""));
     }
 
     private void startPlayList(){

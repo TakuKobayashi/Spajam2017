@@ -63,9 +63,4 @@ void NativeAndroidHelper::gone()
 {
     PlayingScene::gone();
 }
-
-void NativeAndroidHelper::frame(long millisecond)
-{
-    PlayingScene::frame(millisecond);
-}
 #endif
