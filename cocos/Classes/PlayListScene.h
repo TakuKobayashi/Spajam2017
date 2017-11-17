@@ -6,6 +6,11 @@
 #include "PlayingScene.h"
 #include "network/HttpClient.h"
 
+#include "json/rapidjson.h"
+#include "json/document.h"
+#include "json/stringbuffer.h"
+#include "json/writer.h"
+
 class PlayListScene : public cocos2d::Scene{
 private:
     cocos2d::ui::Layout* playlistCellContainer(int position);

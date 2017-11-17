@@ -38,9 +38,6 @@ bool PlayListScene::init()
     playlistView->setClippingEnabled(false);
     playlistView->setTouchEnabled(true);
     playlistView->setDirection(ui::ListView::Direction::VERTICAL);
-    for(int i = 0;i < 100;++i){
-        playlistView->pushBackCustomItem(playlistCellContainer(i));
-    }
     // Sizeを指定しないとScrollとして機能しない
     playlistView->setContentSize(visibleSize);
     playlistView->setPosition(Vec2(origin.x, origin.y));
@@ -68,13 +65,23 @@ bool PlayListScene::init()
     HttpRequest* request = new HttpRequest();
     request->setUrl(url);
     request->setRequestType(HttpRequest::Type::GET);
-    request->setResponseCallback([this](HttpClient* client, HttpResponse* response) {
+    request->setResponseCallback([this, playlistView](HttpClient* client, HttpResponse* response) {
         if (!response) {
             return;
         }
 
         std::string responseString(response->getResponseData()->begin(), response->getResponseData()->end());
-        log("response = %s", responseString.c_str());
+        rapidjson::Document document;
+        if (document.Parse(responseString.c_str()).HasParseError()) {
+            log("parse error!!");
+        }
+        std::string spotifyClientId = document["client_id"].GetString();
+        std::string accessToken = document["access_token"].GetString();
+        const rapidjson::Value& playlists = document["playlists"];
+        assert(playlists.IsArray());
+        for (rapidjson::SizeType i = 0; i < playlists.Size(); ++i){
+            playlistView->pushBackCustomItem(this->playlistCellContainer(i));
+        }
     });
     HttpClient::getInstance()->send(request);
     request->release();
